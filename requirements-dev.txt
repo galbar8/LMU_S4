@@ -1,0 +1,18 @@
+# Development requirements (for pip install -r requirements-dev.txt)
+pytest>=6.2.0
+pytest-cov>=2.12.0
+black>=21.6.0
+flake8>=3.9.0
+mypy>=0.910
+pre-commit>=2.15.0
+
+# Documentation
+sphinx>=4.0.0
+sphinx-rtd-theme>=0.5.0
+
+# Jupyter (optional)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Include base requirements
+-r requirements.txt
