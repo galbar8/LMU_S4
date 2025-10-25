@@ -15,10 +15,10 @@ def main():
     """Main function."""
     print("Welcome to LMU_S4 Project!")
     print("=" * 30)
-    
+
     # Import your modules here
     # from your_module import your_function
-    
+
     # Your main logic here
     pass
 
