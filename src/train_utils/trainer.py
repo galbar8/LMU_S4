@@ -18,6 +18,7 @@ from typing import Any, Dict, Optional, Tuple
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
+from torch.utils.data import DataLoader
 
 from src.train_utils.loops import train_one_epoch, evaluate_one_epoch
 from src.types.task_protocol import TaskProtocol
@@ -62,6 +63,11 @@ class Trainer:
         d_in = self.task.infer_input_dim(flat_args)
         theta = self.task.infer_theta(flat_args)
         n_classes = self.task.infer_num_classes(flat_args)
+
+        # For regression tasks, the output dimension might need to be calculated differently
+        if self.task.problem_type == "regression":
+            pred_len = flat_args.get("pred_len", 1)  # Default to 1 if not specified
+            n_classes = n_classes * pred_len
 
         block_cfg = args["block_cfg_ctor"](theta)
         self.model: nn.Module = self.model_builder(
@@ -113,37 +119,76 @@ class Trainer:
             self.criterion = nn.CrossEntropyLoss(label_smoothing=ls) if ls > 0 else nn.CrossEntropyLoss()
             self.metrics_fn = None
             self.early_key = "acc"
+            self.best_metric = float("-inf")
+            self.history: Dict[str, list] = {
+                "train_loss": [], "train_acc": [], "train_f1_micro": [],
+                "val_loss": [], "val_acc": [], "val_f1_micro": [],
+            }
         elif self.task.problem_type == "multilabel":
             # Multi‑label tasks expect binary targets per class
-            self.criterion = nn.BCEWithLogitsLoss(pos_weight=args.get("pos_weight", None))
+
+            pos_weight = None
+            if args.get("pos_weight", None) is not None:
+                pos_weight = self.compute_pos_weights().to(self.device)
+                print(f"📊 Computed pos_weight for imbalanced classes: {pos_weight.cpu().numpy()}")
+
+            self.criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
             thr = float(args.get("threshold", 0.5))
             self.metrics_fn = multilabel_metrics_fn(threshold=thr)
             self.early_key = args.get("early_key", "f1_micro")
+            self.best_metric = float("-inf")
+            self.history: Dict[str, list] = {
+                "train_loss": [], "train_acc": [], "train_f1_micro": [],
+                "val_loss": [], "val_acc": [], "val_f1_micro": [],
+            }
+        elif self.task.problem_type == "regression":
+            self.criterion = nn.MSELoss()
+            self.metrics_fn = lambda p, t: {"mse": nn.MSELoss()(p, t).item(), "mae": nn.L1Loss()(p, t).item()}
+            self.early_key = args.get("early_key", "mse")
+            self.best_metric = float("inf")  # Lower is better for regression
+            self.history: Dict[str, list] = {
+                "train_loss": [], "train_mse": [], "train_mae": [],
+                "val_loss": [], "val_mse": [], "val_mae": [],
+            }
         else:
             raise ValueError(f"Unsupported problem_type: {self.task.problem_type}")
 
         # Early stopping state
-        self.best_metric = float("-inf")
         self.bad_epochs = 0
         self.patience = int(args.get("patience", 20))
         self.min_delta = float(args.get("min_delta", 0.0))
 
-        # History tracking
-        self.history: Dict[str, list] = {
-            "train_loss": [], "train_acc": [], "train_f1_micro": [],
-            "val_loss": [], "val_acc": [], "val_f1_micro": [],
-        }
+    def _should_stop(self, current: float) -> Tuple[bool, bool]:
+        """Check for improvement and whether early stopping condition is met.
 
-    def _should_stop(self, current: float) -> bool:
-        """Check whether early stopping condition is met."""
-        # If improvement is sufficiently large, reset counter
-        if current > self.best_metric + self.min_delta:
-            self.best_metric = current
+        This method is the single source of truth for what constitutes an
+        improvement. It updates the best metric and bad epoch counter.
+
+        Returns
+        -------
+        is_better : bool
+            True if the current metric is better than the best seen so far.
+        should_stop : bool
+            True if the patience has been exceeded.
+        """
+        is_better = False
+        # Check for improvement, including min_delta
+        if self.task.problem_type == "regression":
+            if current < self.best_metric - self.min_delta:
+                is_better = True
+        else:  # classification
+            if current > self.best_metric + self.min_delta:
+                is_better = True
+
+        if is_better:
+            self.best_metric = current  # Update best metric here
             self.bad_epochs = 0
-            return False
-        # Otherwise increment counter and check against patience
+            return True, False  # Is better, should not stop
+
+        # No improvement
         self.bad_epochs += 1
-        return self.bad_epochs > self.patience
+        should_stop = self.bad_epochs > self.patience
+        return False, should_stop
 
     def save_history(self, save_dir: str) -> str:
         """Save training history to a JSON file.
@@ -196,6 +241,15 @@ class Trainer:
         best_path = os.path.join(save_dir, "best.pt")
         primed_scheduler = False
 
+        # Pass task-specific parameters to the training loops
+        loop_kwargs = {}
+        if self.task.problem_type == "regression":
+            flat_args: Dict[str, Any] = dict(self.args)
+            flat_args.update(self.args.get("data_loader_kwargs", {}))
+            loop_kwargs["pred_len"] = flat_args.get("pred_len")
+            loop_kwargs["d_out"] = self.task.infer_num_classes(flat_args)
+
+
         for ep in range(self.args["epochs"] + 1):
             # Training
             tr = train_one_epoch(
@@ -208,6 +262,7 @@ class Trainer:
                 self.criterion,
                 self.ema,
                 metrics_fn=self.metrics_fn,
+                **loop_kwargs,
             )
             # Validation
             va = evaluate_one_epoch(
@@ -218,6 +273,7 @@ class Trainer:
                 self.criterion,
                 self.ema,
                 metrics_fn=self.metrics_fn,
+                **loop_kwargs,
             )
 
             # Scheduler step after first optimisation step
@@ -228,17 +284,26 @@ class Trainer:
 
             # Track history
             self.history["train_loss"].append(tr.get("loss", 0.0))
-            self.history["train_acc"].append(tr.get("acc", 0.0))
-            self.history["train_f1_micro"].append(tr.get("f1_micro", 0.0))
             self.history["val_loss"].append(va.get("loss", 0.0))
-            self.history["val_acc"].append(va.get("acc", 0.0))
-            self.history["val_f1_micro"].append(va.get("f1_micro", 0.0))
+            if self.task.problem_type == "regression":
+                self.history["train_mse"].append(tr.get("mse", 0.0))
+                self.history["train_mae"].append(tr.get("mae", 0.0))
+                self.history["val_mse"].append(va.get("mse", 0.0))
+                self.history["val_mae"].append(va.get("mae", 0.0))
+            else:
+                self.history["train_acc"].append(tr.get("acc", 0.0))
+                self.history["train_f1_micro"].append(tr.get("f1_micro", 0.0))
+                self.history["val_acc"].append(va.get("acc", 0.0))
+                self.history["val_f1_micro"].append(va.get("f1_micro", 0.0))
 
             # Determine current metric for early stopping
             cur = va.get(self.early_key, None)
-            # Save best model
-            if cur is not None and cur > self.best_metric:
-                self.best_metric = cur
+            metric_for_es = cur if cur is not None else (va["loss"] if self.task.problem_type == "regression" else -va["loss"])
+
+            # Check for improvement and early stopping using the single source of truth
+            is_better, should_stop = self._should_stop(metric_for_es)
+
+            if is_better:
                 # Filter out non-picklable objects from args (like functions)
                 save_args = {k: v for k, v in self.args.items()
                             if not callable(v) and k not in {"block_cfg_ctor"}}
@@ -249,11 +314,10 @@ class Trainer:
                     "args": save_args,
                     "history": self.history,
                 }, best_path)
-                print(f"new best {self.early_key} {self.best_metric:.4f}")
+                print(f"💾 saved best model to {best_path}")
+                print(f"✅ new best {self.early_key} {self.best_metric:.4f}")
 
-            # Check early stopping
-            metric_for_es = cur if cur is not None else -va["loss"]
-            if self._should_stop(metric_for_es):
+            if should_stop:
                 print(
                     f"⏹ Early stopping (patience={self.patience}, best={self.best_metric:.4f})."
                 )
@@ -262,8 +326,12 @@ class Trainer:
             # Logging (replace prints with proper logging if needed)
             # Show a concise summary each epoch
             metric_name = self.early_key
-            tr_metric = tr.get(metric_name, tr.get("acc", tr.get("f1_micro", float("nan"))))
-            va_metric = va.get(metric_name, va.get("acc", va.get("f1_micro", float("nan"))))
+            if self.task.problem_type == "regression":
+                tr_metric = tr.get(metric_name, tr.get("mse", float("nan")))
+                va_metric = va.get(metric_name, va.get("mse", float("nan")))
+            else:
+                tr_metric = tr.get(metric_name, tr.get("acc", tr.get("f1_micro", float("nan"))))
+                va_metric = va.get(metric_name, va.get("acc", va.get("f1_micro", float("nan"))))
             print(
                 f"Epoch {ep:03d}/{self.args['epochs']} | "
                 f"train {tr['loss']:.4f}/{tr_metric:.4f} | "
@@ -278,3 +346,39 @@ class Trainer:
 
         # Return best metric and checkpoint path
         return self.best_metric, best_path
+
+    def compute_pos_weights(self) -> torch.Tensor:
+        """
+        Compute per-class positive weights for BCEWithLogitsLoss.
+
+        For imbalanced datasets, pos_weight = N_neg / N_pos helps the model
+        pay more attention to rare positive samples.
+
+        Returns
+        -------
+        torch.Tensor
+            Tensor of shape (num_classes,) with pos_weight for each class.
+        """
+        all_labels = []
+
+        print("Computing pos_weight from training set...")
+        for batch in self.train_loader:
+            _, y = batch
+            all_labels.append(y)
+
+        y_train = torch.cat(all_labels, dim=0)
+        n_samples = y_train.shape[0]
+
+        pos = y_train.sum(dim=0)
+        neg = (1 - y_train).sum(dim=0)
+
+        pos_weight = neg / (pos + 1e-8)
+
+        # Log class distribution
+        print(f"  Total training samples: {n_samples}")
+        print(f"  Positive samples per class: {pos.numpy()}")
+        print(f"  Negative samples per class: {neg.numpy()}")
+        prevalence = (pos / n_samples * 100).numpy()
+        print(f"  Class prevalence: {prevalence}%")
+
+        return pos_weight

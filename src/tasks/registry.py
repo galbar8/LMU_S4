@@ -2,7 +2,7 @@ from typing import Dict, Any, Tuple, Optional
 from .spec import TaskSpec
 
 # ==== ESC-50 bindings ====
-from src.datasets.esc50.esc50_dataset2 import make_esc50_loaders
+from src.datasets.esc50.esc50_dataset import make_esc50_loaders
 
 def _esc50_d_in(args: Dict[str, Any]) -> int:
     return args["n_mels"] if args.get("feature","melspec") == "melspec" else 1

@@ -33,6 +33,7 @@ def train_one_epoch(
     *,
     metrics_fn: Optional[Callable[[torch.Tensor, torch.Tensor], Dict[str, float]]] = None,
     grad_clip: float = CLIP_NORM,
+    **kwargs,
 ) -> Dict[str, Any]:
     """
     metrics_fn: optional callable computing extra metrics from (logits, targets).
@@ -45,6 +46,9 @@ def train_one_epoch(
     n = 0
     saw_opt_step = False
 
+    pred_len = kwargs.get("pred_len")
+    d_out = kwargs.get("d_out")
+
     with Timer() as t:
         for batch in tqdm(loader, desc="train", leave=False):
             xb, yb, _ = _unpack_batch(batch)
@@ -53,6 +57,8 @@ def train_one_epoch(
             optimizer.zero_grad(set_to_none=True)
             with amp_autocast(amp):
                 logits = model(xb)
+                if pred_len is not None and d_out is not None:
+                    logits = logits.view(xb.size(0), pred_len, d_out)
                 loss = lossfn(logits, yb)
 
             if amp and device.type == "cuda" and scaler is not None:
@@ -101,6 +107,7 @@ def evaluate_one_epoch(
     ema = None,
     *,
     metrics_fn: Optional[Callable[[torch.Tensor, torch.Tensor], Dict[str, float]]] = None,
+    **kwargs,
 ) -> Dict[str, Any]:
     """
     See train_one_epoch for metrics_fn contract.
@@ -113,12 +120,17 @@ def evaluate_one_epoch(
     sums: Dict[str, float] = {}
     n = 0
 
+    pred_len = kwargs.get("pred_len")
+    d_out = kwargs.get("d_out")
+
     with Timer() as t:
         for batch in tqdm(loader, desc="val", leave=False):
             xb, yb, _ = _unpack_batch(batch)
             xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
             with amp_autocast(amp):
                 logits = model(xb)
+                if pred_len is not None and d_out is not None:
+                    logits = logits.view(xb.size(0), pred_len, d_out)
                 loss = loss_fn(logits, yb)
             bs = xb.size(0)
             tot_loss += loss.item() * bs
