@@ -4,33 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/models/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/s4/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/s4/krylov.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/s4/s4_block.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/models/v2/s4_block.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4_training.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/etts/utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" afterDir="false" />
+    <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset2.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/base.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/classifier.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/lmu_block.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/v2/build_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/v2/build_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu_training.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu_training.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tasks/registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tasks/registry.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/train_utils/loops.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/loops.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/train_utils/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/trainer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -193,8 +169,17 @@
       <workItem from="1763036104343" duration="34000" />
       <workItem from="1763036141256" duration="452000" />
       <workItem from="1763036598398" duration="306000" />
-      <workItem from="1763036916489" duration="23684000" />
+      <workItem from="1763036916489" duration="25996000" />
     </task>
+    <task id="LOCAL-00001" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1763214883923</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1763214883924</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -210,6 +195,10 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="WIP" />
+    <option name="LAST_COMMIT_MESSAGE" value="WIP" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/LMU_S4$try.coverage" NAME="try Coverage Results" MODIFIED="1757962258417" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/notebooks" />
