@@ -59,4 +59,8 @@ class SeqClassifier(nn.Module):
             x = self.attnpool(x)
         else:
             x = x.mean(dim=1)
-        return self.head(x)
+        x = self.head(x)
+        # For regression (n_classes=1), squeeze to [B] instead of [B, 1]
+        if x.shape[-1] == 1:
+            x = x.squeeze(-1)
+        return x

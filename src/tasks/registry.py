@@ -3,6 +3,8 @@ from .spec import TaskSpec
 
 # ==== ESC-50 bindings ====
 from src.datasets.esc50.esc50_dataset import make_esc50_loaders
+from src.datasets.ptbxl.ptbxl_dataloader import make_ptbxl_loaders
+
 
 def _esc50_d_in(args: Dict[str, Any]) -> int:
     return args["n_mels"] if args.get("feature","melspec") == "melspec" else 1
@@ -24,8 +26,6 @@ ESC50 = TaskSpec(
 )
 
 # ==== PTB-XL bindings ====
-# You already mentioned: make_ptbxl_loaders(data_root, batch_size, sampling="lr100", length=1000)
-from src.datasets.ptbxl.ptbxl_dataset import make_ptbxl_loaders  # <- your function
 
 def _ptbxl_d_in(args: Dict[str, Any]) -> int:
     # 12-lead ECG is common; if your loader supports variable leads, surface it via args

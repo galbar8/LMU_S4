@@ -5,8 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
+      <change afterPath="$PROJECT_DIR$/src/datasets/ppg/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/ppg/ppg_config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/ppg/ppg_dataloader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/ppg/ppg_dataset.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/ppg/ppg_filters.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_lmu.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/v2/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/v2/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/v2/classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/v2/classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tasks/registry.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/tasks/registry.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/metrics.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,7 +74,7 @@
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/datasets/etts/data",
+    "last_opened_file_path": "/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/datasets/ppg/data",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -77,6 +87,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/datasets/ppg/data" />
       <recent name="$PROJECT_DIR$/src/datasets/etts/data" />
       <recent name="$PROJECT_DIR$/src/notebooks/ptbxl/saves" />
       <recent name="$PROJECT_DIR$/src/datasets/ptbxl" />
@@ -169,7 +180,7 @@
       <workItem from="1763036104343" duration="34000" />
       <workItem from="1763036141256" duration="452000" />
       <workItem from="1763036598398" duration="306000" />
-      <workItem from="1763036916489" duration="25996000" />
+      <workItem from="1763036916489" duration="46779000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -179,7 +190,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763214883924</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1763322507331</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1763322507331</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
