@@ -2,6 +2,7 @@ tqdm
 requests
 torchaudio
 torch
+torchvision
 soundfile
 torchcodec
 # Core dependencies

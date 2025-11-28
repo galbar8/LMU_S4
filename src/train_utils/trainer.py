@@ -18,8 +18,8 @@ from typing import Any, Dict, Optional, Tuple
 import torch
 import torch.nn as nn
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
-from torch.utils.data import DataLoader
 
+from src.models.v2.build_model import build_model
 from src.train_utils.loops import train_one_epoch, evaluate_one_epoch
 from src.types.task_protocol import TaskProtocol
 from src.utils.metrics import multilabel_metrics_fn
@@ -35,15 +35,13 @@ class Trainer:
     task: TaskProtocol
         A task specification with ``make_loaders`` and ``infer_*`` methods and a
         ``problem_type`` attribute (``"multiclass"`` or ``"multilabel"``).
-    model_builder: callable
-        A function that constructs the neural network given input/output sizes and
         other model hyperparameters.
     """
 
-    def __init__(self, args: Dict[str, Any], task: TaskProtocol, model_builder: Any) -> None:
+    def __init__(self, args: Dict[str, Any], task: TaskProtocol) -> None:
         self.args = args
         self.task = task
-        self.model_builder = model_builder
+        self.model_builder = build_model
 
         # Device selection
         self.device: torch.device = args.get("device", torch.device("cuda" if torch.cuda.is_available() else "cpu"))
@@ -181,7 +179,7 @@ class Trainer:
                 is_better = True
 
         if is_better:
-            self.best_metric = current  # Update best metric here
+            self.best_metric = current  # Update the best metric here
             self.bad_epochs = 0
             return True, False  # Is better, should not stop
 
@@ -304,7 +302,6 @@ class Trainer:
             is_better, should_stop = self._should_stop(metric_for_es)
 
             if is_better:
-                # Filter out non-picklable objects from args (like functions)
                 save_args = {k: v for k, v in self.args.items()
                             if not callable(v) and k not in {"block_cfg_ctor"}}
                 torch.save({
@@ -356,8 +353,7 @@ class Trainer:
 
         Returns
         -------
-        torch.Tensor
-            Tensor of shape (num_classes,) with pos_weight for each class.
+        torch.Tensor             of shape (num_classes,) with pos_weight for each class.
         """
         all_labels = []
 

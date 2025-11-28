@@ -9,7 +9,7 @@ from tqdm.auto import tqdm
 from torch.amp import autocast as amp_autocast
 
 from src.datasets.etts.etts_dataloader import make_etts_loaders
-from src.models.v2.build_model import BlockConfig
+from src.models.v2.build_model import BlockConfig, build_model
 from src.types.task_protocol import TaskProtocol
 
 
@@ -115,7 +115,6 @@ def make_block_cfg_ctor(
 def evaluate_best_model(
     args: dict,
     task: TaskProtocol,
-    model_builder: Callable,
     best_model_path: str
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
@@ -124,7 +123,6 @@ def evaluate_best_model(
     Args:
         args: Configuration dictionary with data_root, batch, device, etc.
         task: TaskProtocol instance for creating data loaders and inferring dimensions
-        model_builder: Function to build the model (e.g., build_model)
         best_model_path: Path to the best checkpoint file
 
     Returns:
@@ -153,7 +151,7 @@ def evaluate_best_model(
 
     # Re-create model architecture
     block_cfg = args["block_cfg_ctor"](theta)
-    model = model_builder(
+    model = build_model(
         d_in=d_in,
         n_classes=d_out * pred_len,
         d_model=args["d_model"],
