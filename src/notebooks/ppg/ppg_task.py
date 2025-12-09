@@ -21,11 +21,9 @@ class PPGTask(TaskProtocol):
         **kwargs
     ) -> Tuple[DataLoader, DataLoader, DataLoader]:
         """Create data loaders using PPGDaliaConfig."""
-        # Separate dataloader kwargs from config kwargs
         pin_memory = kwargs.pop("pin_memory", False)
         persistent_workers = kwargs.pop("persistent_workers", False)
 
-        # Remaining kwargs go to PPGDaliaConfig
         cfg = PPGDaliaConfig(root=data_root, **kwargs)
 
         return make_ppgdalia_loaders(
@@ -37,7 +35,7 @@ class PPGTask(TaskProtocol):
         )
 
     def infer_input_dim(self, args: Dict[str, Any]) -> int:
-        """Single PPG channel."""
+        """Single PPG channel + X, Y, Z acc position ."""
         return 4
 
     def infer_num_classes(self, args: Dict[str, Any]) -> int:

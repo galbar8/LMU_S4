@@ -3,12 +3,12 @@ from __future__ import annotations
 from typing import Tuple, Dict, Any
 import os
 import torch
-from torch.amp import autocast as amp_autocast
 
 from src.models.v2.build_model import build_model
 from src.types.task_protocol import TaskProtocol
 from src.eval.infer import predict_loader
 from src.utils.metrics import multilabel_metrics_fn
+from src.utils.common import amp_autocast
 
 
 def evaluate_best_model(
@@ -39,7 +39,6 @@ def evaluate_best_model(
     _, val_loader, test_loader = task.make_loaders(
         data_root=data_root,
         batch_size=args["batch"],
-        num_workers=args.get("data_loader_kwargs", {}).get("num_workers", 0),
         **args.get("data_loader_kwargs", {})
     )
 

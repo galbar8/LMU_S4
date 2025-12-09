@@ -6,6 +6,7 @@ import torch
 from tqdm.auto import tqdm
 from torch.amp import autocast as amp_autocast
 
+from src.models.v2.build_model import build_model
 from src.types.task_protocol import TaskProtocol
 
 def load_best_model(
@@ -48,16 +49,14 @@ def load_best_model(
 def evaluate_best_model(
     args: dict,
     task: TaskProtocol,
-    model_builder: callable,
     best_model_path: str
 ) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Load best checkpoint and evaluate on test set.
+    Load the best checkpoint and evaluate on test set.
 
     Args:
         args: Training arguments dictionary
         task: Task protocol instance
-        model_builder: Function to build the model
         best_model_path: Path to the best model checkpoint
 
     Returns:
@@ -75,7 +74,7 @@ def evaluate_best_model(
         **args["data_loader_kwargs"]
     )
 
-    model = load_best_model(args, task, model_builder, best_model_path)
+    model = load_best_model(args, task, build_model, best_model_path)
     model.eval()
 
     val_metrics = checkpoint.get('val', {})

@@ -51,10 +51,10 @@ def make_psmnist_loaders(
     # Create test config (same permutation!)
     test_cfg = PSMNISTConfig(
         root=root,
-        permutation_seed=permutation_seed,  # MUST be same as train
+        permutation_seed=permutation_seed,
         normalize=normalize,
         split="test",
-        subset_size=None,  # Use full test set for proper evaluation
+        subset_size=None,
         download=download,
     )
 
@@ -69,11 +69,11 @@ def make_psmnist_loaders(
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
-        shuffle=True,  # Shuffle training data
+        shuffle=True,
         num_workers=num_workers,
         pin_memory=pin_memory,
         persistent_workers=pw,
-        drop_last=True,  # Drop incomplete batch for stable training
+        drop_last=True,
     )
 
     test_loader = DataLoader(
@@ -83,7 +83,7 @@ def make_psmnist_loaders(
         num_workers=num_workers,
         pin_memory=pin_memory,
         persistent_workers=pw,
-        drop_last=False,  # Keep all test samples
+        drop_last=False,
     )
 
     print(f"PS-MNIST Loaders Created:")

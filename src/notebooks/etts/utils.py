@@ -1,4 +1,3 @@
-"""Shared utilities for ETTS notebooks."""
 from __future__ import annotations
 from typing import Tuple, Dict, Any, Callable
 

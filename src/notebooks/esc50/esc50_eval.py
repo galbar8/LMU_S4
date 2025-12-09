@@ -7,7 +7,7 @@ from src.eval.infer import predict_loader
 from src.eval.metrics import confusion_matrix
 from src.eval.report import print_basic_report, plot_confusion, print_per_class
 from src.utils.common import amp_autocast
-
+import matplotlib.pyplot as plt
 
 def evaluate_best_model(
     trainer,
@@ -48,7 +48,7 @@ def evaluate_best_model(
 
     # Confusion matrix
     cm = confusion_matrix(logits, labels, num_classes=num_classes)
-    plot_confusion(cm, class_names=None, normalize=True, figsize=(10, 10))
+    plot_confusion(cm, class_names=None, normalize=True, figsize=(6, 6))
 
     # Per-class statistics
     print("\nTop-10 and Bottom-10 Classes by Performance:")
@@ -63,8 +63,6 @@ def plot_training_history(trainer, model_name: str = "Model"):
         trainer: Trained Trainer instance with history
         model_name: Name to display in plot titles (e.g., "LMU", "S4")
     """
-    import matplotlib.pyplot as plt
-
     history = trainer.history
 
     # Plot Accuracy

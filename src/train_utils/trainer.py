@@ -23,6 +23,7 @@ from src.models.v2.build_model import build_model
 from src.train_utils.loops import train_one_epoch, evaluate_one_epoch
 from src.types.task_protocol import TaskProtocol
 from src.utils.metrics import multilabel_metrics_fn
+from src.utils.subset_loaders import apply_fraction_to_loaders
 
 
 class Trainer:
@@ -48,11 +49,22 @@ class Trainer:
         self.amp: bool = bool(args.get("amp", False) and self.device.type in {"cuda", "mps"})
 
         # Data loaders
-        self.train_loader, self.val_loader, _ = self.task.make_loaders(
+        self.train_loader, self.val_loader, test_loader = self.task.make_loaders(
             data_root=args["data_root"],
             batch_size=args["batch"],
             **args.get("data_loader_kwargs", {})
         )
+
+        # Apply fraction reduction if specified (works for all datasets!)
+        fraction = args.get("fraction", args.get("data_loader_kwargs", {}).get("fraction", 1.0))
+        if fraction < 1.0:
+            self.train_loader, self.val_loader, test_loader = apply_fraction_to_loaders(
+                self.train_loader,
+                self.val_loader,
+                test_loader,
+                fraction=fraction,
+                seed=args.get("seed", 42),
+            )
 
         flat_args: Dict[str, Any] = dict(self.args)
         flat_args.update(self.args.get("data_loader_kwargs", {}))

@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader
 from src.types.task_protocol import TaskProtocol
 from src.datasets.psmnist.psmnist_dataloader import make_psmnist_loaders
 
-
 class PSMNISTTask(TaskProtocol):
     """
     Permuted Sequential MNIST classification task.
@@ -40,10 +39,16 @@ class PSMNISTTask(TaskProtocol):
         permutation_seed = kwargs.get("permutation_seed", 42)
         normalize = kwargs.get("normalize", "standard")
         subset_size = kwargs.get("subset_size", None)
+        fraction = kwargs.get("fraction", 1.0)
         download = kwargs.get("download", True)
         pin_memory = kwargs.get("pin_memory", False)
         persistent_workers = kwargs.get("persistent_workers", False)
         num_workers = kwargs.get("num_workers", 0)
+
+        # Convert fraction to subset_size if specified
+        if fraction < 1.0 and subset_size is None:
+            # MNIST train has 60000 samples
+            subset_size = int(60000 * fraction)
 
         train_loader, test_loader = make_psmnist_loaders(
             root=data_root,

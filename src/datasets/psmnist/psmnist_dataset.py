@@ -53,7 +53,7 @@ class PSMNISTDataset(Dataset):
             self.std = 0.3081
         elif cfg.normalize == "minmax":
             self.mean = 0.0
-            self.std = 255.0  # Scale from [0, 255] to [0, 1]
+            self.std = 255.0
         else:  # none
             self.mean = 0.0
             self.std = 1.0
