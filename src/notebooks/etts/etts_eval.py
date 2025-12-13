@@ -9,13 +9,15 @@ from torch.amp import autocast as amp_autocast
 
 from src.models.v2.build_model import build_model
 from src.types.task_protocol import TaskProtocol
+from src.utils.checkpoint import save_test_results
 
 
 def evaluate_best_model(
     args: dict,
     task: TaskProtocol,
-    best_model_path: str
-) -> Tuple[np.ndarray, np.ndarray]:
+    best_model_path: str,
+    save_results: bool = True
+) -> Tuple[any, any, any]:
     """
     Load the best checkpoint and evaluate on the test set.
 
@@ -23,9 +25,10 @@ def evaluate_best_model(
         args: Configuration dictionary with data_root, batch, device, etc.
         task: TaskProtocol instance for creating data loaders and inferring dimensions
         best_model_path: Path to the best checkpoint file
+        save_results: Whether to save test results to JSON file (default: True)
 
     Returns:
-        Tuple of (predictions, targets) as numpy arrays
+        Tuple of test_mae, test_mse, test_rmse
     """
     print("Evaluating best model on the test set...")
 
@@ -92,7 +95,19 @@ def evaluate_best_model(
     print(f"MAE:  {test_mae:.6f}")
     print(f"RMSE: {test_rmse:.6f}")
 
-    return all_preds, all_targets
+    # Save test results to file
+    if save_results:
+        test_results = {
+            'mse': float(test_mse),
+            'mae': float(test_mae),
+            'rmse': float(test_rmse),
+            'num_samples': int(all_preds.shape[0])
+        }
+        results_path = save_test_results(best_model_path, test_results)
+        print("=" * 50)
+        print(f"✅ Test results saved to: {results_path}")
+
+    return test_mae, test_mse, test_rmse
 
 
 

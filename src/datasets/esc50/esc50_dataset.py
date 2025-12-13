@@ -365,7 +365,7 @@ def make_esc50_loaders(
 
     # First create a train_utils dataset to compute CMVN if needed
     train_ds = ESC50Dataset(ESC50Config(**common, split="train_utils"))
-    cmvn_stats = None
+
     if feature == "melspec" and normalize == "global_cmvn":
         # pass stats to val
         cmvn_stats = {
@@ -390,4 +390,4 @@ def make_esc50_loaders(
         worker_init_fn=worker_init_fn,
         persistent_workers=(num_workers > 0),
     )
-    return train_loader, val_loader, cmvn_stats
+    return train_loader, val_loader

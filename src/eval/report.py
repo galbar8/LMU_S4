@@ -4,13 +4,12 @@ from typing import List, Optional
 import matplotlib.pyplot as plt
 import numpy as np
 
-from .metrics import accuracy, per_class_accuracy
+from .metrics import per_class_accuracy
 
-def print_basic_report(logits: torch.Tensor, y: torch.Tensor, class_names: Optional[List[str]] = None):
-    acc = accuracy(logits, y)
+def print_basic_report(acc: float, num_classes: Optional[int] = None):
     print(f"Overall accuracy: {acc:.4f}")
-    if class_names is not None:
-        print(f"Num classes: {len(class_names)}")
+    if num_classes is not None:
+        print(f"Num classes: {num_classes}")
 
 def plot_confusion(cm: torch.Tensor, class_names: Optional[List[str]] = None, normalize: bool = True, figsize=(10,10)):
     if normalize:

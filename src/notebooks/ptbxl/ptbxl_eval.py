@@ -3,19 +3,22 @@ from __future__ import annotations
 from typing import Tuple, Dict, Any
 import os
 import torch
+from matplotlib import pyplot as plt
 
 from src.models.v2.build_model import build_model
 from src.types.task_protocol import TaskProtocol
 from src.eval.infer import predict_loader
 from src.utils.metrics import multilabel_metrics_fn
 from src.utils.common import amp_autocast
-
+from src.utils.checkpoint import save_test_results
 
 def evaluate_best_model(
     args: Dict[str, Any],
     task: TaskProtocol,
     best_model_path: str,
-    data_root: str
+    data_root: str,
+    save_results: bool = True,
+    threshold: float = 0.5
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     Load the best checkpoint and evaluate on validation and test sets.
@@ -25,11 +28,13 @@ def evaluate_best_model(
         task: Task protocol instance
         best_model_path: Path to the best model checkpoint
         data_root: Root directory of the dataset
+        save_results: Whether to save test results to JSON file (default: True)
+        threshold: Decision threshold for binary predictions (default: 0.5)
 
     Returns:
         (logits_val, labels_val, logits_test, labels_test) as torch tensors
     """
-    print("📊 Evaluating best model on validation and test sets...")
+    print("Evaluating best model on validation and test sets...")
 
     # Check if checkpoint exists
     if not os.path.exists(best_model_path):
@@ -70,14 +75,29 @@ def evaluate_best_model(
 
     amp = args.get("amp", False) and device.type in {"cuda", "mps"}
 
-    print(f"✅ Loaded checkpoint from epoch {best_ckpt.get('epoch', 'N/A')}")
-    print(f"📈 Val metrics: {best_ckpt.get('val', {})}")
+    print(f"Loaded checkpoint from epoch {best_ckpt.get('epoch', 'N/A')}")
+    print(f"Val metrics: {best_ckpt.get('val', {})}")
 
     # Get predictions on validation set
     logits_val, labels_val = predict_loader(model, val_loader, device, amp_autocast, amp)
 
     # Get predictions on test set
     logits_test, labels_test = predict_loader(model, test_loader, device, amp_autocast, amp)
+
+    # Compute and save test metrics
+    if save_results:
+        metrics_fn = multilabel_metrics_fn(threshold=threshold)
+        test_metrics = metrics_fn(logits_test, labels_test)
+
+        # Add number of samples
+        test_results = {
+            'f1_micro': float(test_metrics['f1_micro']),
+            'num_samples': int(labels_test.shape[0]),
+            'threshold': threshold
+        }
+
+        results_path = save_test_results(best_model_path, test_results)
+        print(f"✅ Test results saved to: {results_path}")
 
     return logits_val, labels_val, logits_test, labels_test
 
@@ -104,12 +124,11 @@ def print_evaluation_results(
     if class_names is None:
         class_names = ["NORM", "MI", "STTC", "HYP", "CD"]
 
-    metrics_fn = multilabel_metrics_fn(threshold=threshold)
-
     # Overall metrics
     print("\n" + "=" * 60)
     print("VALIDATION SET RESULTS:")
     print("=" * 60)
+    metrics_fn = multilabel_metrics_fn(threshold=threshold)
     val_metrics = metrics_fn(logits_val, labels_val)
     for k, v in val_metrics.items():
         print(f"{k}: {v:.4f}")
@@ -117,6 +136,7 @@ def print_evaluation_results(
     print("\n" + "=" * 60)
     print("TEST SET RESULTS:")
     print("=" * 60)
+    metrics_fn = multilabel_metrics_fn(threshold=threshold)
     test_metrics = metrics_fn(logits_test, labels_test)
     for k, v in test_metrics.items():
         print(f"{k}: {v:.4f}")
@@ -157,3 +177,26 @@ def print_evaluation_results(
 
     print("=" * 60)
 
+def plot_train_history(history):
+    plt.figure(figsize=(12, 8))
+    plt.plot(history["train_loss"], label="train_loss", linewidth=2)
+    plt.plot(history["val_loss"], label="val_loss", linewidth=2)
+    plt.xlabel("Epoch", fontsize=12)
+    plt.ylabel("Loss", fontsize=12)
+    plt.legend(fontsize=11)
+    plt.title("Training and Validation Loss", fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+    # F1-Micro plot
+    plt.figure(figsize=(12, 8))
+    plt.plot(history["train_f1_micro"], label="train_f1_micro", linewidth=2)
+    plt.plot(history["val_f1_micro"], label="val_f1_micro", linewidth=2)
+    plt.xlabel("Epoch", fontsize=12)
+    plt.ylabel("F1-Micro", fontsize=12)
+    plt.legend(fontsize=11)
+    plt.title("Training and Validation F1-Micro Score", fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
