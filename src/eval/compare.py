@@ -94,7 +94,9 @@ def load_all_experiments(
     base_dir: str,
     models: List[str],
     fractions: List[float],
-    task_name: str = "task"
+    task_name: str = "task",
+    sub_task: str = None,
+    print_logs: bool = True
 ) -> Dict[str, Dict[float, Dict[str, Any]]]:
 
     base_path = Path(base_dir)
@@ -104,19 +106,21 @@ def load_all_experiments(
         all_results[model] = {}
 
         for frac in fractions:
-            # Construct run directory name
-            if frac == 1.0:
-                # Full dataset (no fraction suffix)
-                run_name = f"{task_name}_{model}_task"
-            else:
+            run_name = f"{task_name}_{model}_task"
+
+            if sub_task:
+                run_name = f"{run_name}_{sub_task}"
+
+            if frac < 1.0:
                 # Fractional dataset
                 frac_pct = int(frac * 100)
-                run_name = f"{task_name}_{model}_task_frac_{frac_pct}"
+                run_name = f"{run_name}_frac_{frac_pct}"
 
             run_dir = base_path / run_name
 
             if run_dir.exists():
-                print(f"📂 Loading {model.upper()} @ {frac*100:.0f}%: {run_name}")
+                if print_logs:
+                    print(f"Loading {model.upper()} @ {frac*100:.0f}%: {run_name}")
                 results = load_run_results(str(run_dir))
                 all_results[model][frac] = results
             else:
@@ -244,54 +248,16 @@ def plot_metric_comparison_bar(
     plt.tight_layout()
     plt.show()
 
-
-def create_comparison_table(
-    all_results: Dict[str, Dict[float, Dict[str, Any]]],
-    metrics: List[str] = ['best_val_mae', 'best_val_loss', 'epochs_trained']
-) -> pd.DataFrame:
-    """
-    Create a comparison table for all experiments.
-
-    Args:
-        all_results: Results from load_all_experiments()
-        metrics: List of metric keys to include
-
-    Returns:
-        pandas DataFrame with comparison
-    """
-    rows = []
-
-    for model in sorted(all_results.keys()):
-        for frac in sorted(all_results[model].keys()):
-            results = all_results[model][frac]
-            if not results:
-                continue
-
-            row = {
-                'model': model.upper(),
-                'data_pct': int(frac * 100),
-            }
-
-            for metric in metrics:
-                val = results.get(metric)
-                row[metric] = val if val is not None else np.nan
-
-            rows.append(row)
-
-    df = pd.DataFrame(rows)
-    return df
-
-
 def create_test_comparison_table(
     all_results: Dict[str, Dict[float, Dict[str, Any]]],
-    test_metrics: List[str] = ['test_mae', 'test_mse', 'test_rmse']
+    metrics: List[str] = ['test_mae', 'test_mse', 'test_rmse']
 ) -> pd.DataFrame:
     """
     Create a comparison table focused on test metrics.
 
     Args:
         all_results: Results from load_all_experiments()
-        test_metrics: List of test metric keys to include
+        metrics: List of test metric keys to include
 
     Returns:
         pandas DataFrame with test metrics comparison
@@ -305,7 +271,7 @@ def create_test_comparison_table(
                 continue
 
             # Only include if test metrics exist
-            if not any(results.get(metric) is not None for metric in test_metrics):
+            if not any(results.get(metric) is not None for metric in metrics):
                 continue
 
             row = {
@@ -313,7 +279,7 @@ def create_test_comparison_table(
                 'data_pct': int(frac * 100),
             }
 
-            for metric in test_metrics:
+            for metric in metrics:
                 val = results.get(metric)
                 row[metric] = val if val is not None else np.nan
 
