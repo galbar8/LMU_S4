@@ -36,11 +36,23 @@ def device_auto():
         return torch.device("cpu")
 
 @contextmanager
-def amp_autocast(enabled: bool):
-    if not enabled: yield
+def amp_autocast(device_type: str = "cuda", enabled: bool = True):
+    """
+    Automatic mixed precision context manager.
+
+    Args:
+        device_type: Device type ('cuda', 'cpu', or 'mps')
+        enabled: Whether to enable AMP
+    """
+    if not enabled:
+        yield
     else:
-        with torch.autocast(device_type="cuda" if torch.cuda.is_available() else "cpu", dtype=torch.float16):
+        # MPS doesn't support AMP, fall back to regular precision
+        if device_type == "mps":
             yield
+        else:
+            with torch.autocast(device_type=device_type, dtype=torch.float16):
+                yield
 
 
 def print_model_details(model, trainer=None):

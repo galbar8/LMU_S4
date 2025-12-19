@@ -41,8 +41,8 @@ def load_trainer_from_checkpoint(
     if "history" in checkpoint:
         trainer.history = checkpoint["history"]
 
-    print(f"✅ Loaded checkpoint from epoch {checkpoint.get('epoch', 'unknown')}")
-    print(f"📊 Val metrics: {checkpoint.get('val', {})}")
+    print(f"Loaded checkpoint from epoch {checkpoint.get('epoch', 'unknown')}")
+    print(f"Val metrics: {checkpoint.get('val', {})}")
 
     return trainer
 
@@ -94,3 +94,28 @@ def load_test_results(
 
     with open(results_path, 'r') as f:
         return json.load(f)
+
+
+def load_checkpoint_history(checkpoint_path: str) -> Dict[str, Any]:
+    """
+    Load training history from a checkpoint file.
+
+    Args:
+        checkpoint_path: Path to the checkpoint file
+
+    Returns:
+        Dictionary containing training history (train_loss, val_loss, etc.)
+    """
+    try:
+        checkpoint = torch.load(checkpoint_path, map_location='cpu')
+        history = checkpoint.get('history', {})
+
+        if not history:
+            print(f"⚠No history found in {checkpoint_path}")
+            return {}
+
+        return history
+    except Exception as e:
+        print(f"Error loading {checkpoint_path}: {e}")
+        return {}
+

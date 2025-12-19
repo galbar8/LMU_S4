@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Dict, List, Any
-from src.utils.checkpoint import load_test_results
+from src.utils.checkpoint import load_test_results, load_checkpoint_history
 
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
@@ -63,8 +63,9 @@ def load_run_results(run_dir: str) -> Dict[str, Any]:
         results['test_rmse'] = saved_test_results.get('rmse')
 
         # For classification tasks (PS-MNIST, ESC-50, PTB-XL)
-        results['test_acc'] = saved_test_results.get('test_accuracy')
-        results['test_loss'] = saved_test_results.get('test_loss')
+        # Note: JSON saves as 'accuracy' and 'loss', not 'test_accuracy' and 'test_loss'
+        results['accuracy'] = saved_test_results.get('accuracy')
+        results['loss'] = saved_test_results.get('loss')
         results['per_class_accuracy'] = saved_test_results.get('per_class_accuracy')
 
         # For multi-label classification (PTB-XL)
@@ -76,19 +77,6 @@ def load_run_results(run_dir: str) -> Dict[str, Any]:
 
     return results
 
-def load_checkpoint_history(checkpoint_path: str) -> Dict[str, List[float]]:
-    try:
-        checkpoint = torch.load(checkpoint_path, map_location='cpu')
-        history = checkpoint.get('history', {})
-
-        if not history:
-            print(f"No history found in {checkpoint_path}")
-            return {}
-
-        return history
-    except Exception as e:
-        print(f"Error loading {checkpoint_path}: {e}")
-        return {}
 
 def load_all_experiments(
     base_dir: str,
@@ -298,7 +286,6 @@ def plot_test_metric_comparison(
     metric_key: str = 'test_mae',
     title: str = 'Test MAE Comparison',
     ylabel: str = 'Test MAE (bpm)',
-    lower_is_better: bool = True
 ):
     """
     Create bar chart comparing test metrics across models and fractions.
@@ -308,7 +295,6 @@ def plot_test_metric_comparison(
         metric_key: Key for the test metric to compare
         title: Plot title
         ylabel: Y-axis label
-        lower_is_better: If True, lower values are better (for MAE, MSE)
     """
     models = list(all_results.keys())
     fractions = sorted(set(f for model_results in all_results.values()
@@ -522,3 +508,77 @@ def plot_single_metric_comparison(
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_performance_heatmap(
+    all_results: Dict[str, Dict[float, Dict[str, Any]]],
+    metric_key: str = 'accuracy',
+    title: str = 'Performance Heatmap',
+    cmap: str = 'RdYlGn',
+    annot_format: str = '.4f',
+    vmin: float = None,
+    vmax: float = None
+):
+    """
+    Create a heatmap showing metric values across models and data fractions.
+
+    Args:
+        all_results: Results from load_all_experiments()
+        metric_key: Metric to visualize (e.g., 'test_f1_micro', 'test_mae', 'accuracy')
+        title: Plot title
+        cmap: Colormap name (default: 'RdYlGn' for green=good)
+        annot_format: Format string for annotations (e.g., '.4f', '.2f', '.2%')
+        vmin: Minimum value for color scale
+        vmax: Maximum value for color scale
+    """
+    models = sorted(all_results.keys())
+    fractions = sorted(set(f for model_results in all_results.values()
+                          for f in model_results.keys()))
+
+    # Create matrix for heatmap
+    data = []
+    for model in models:
+        row = []
+        for frac in fractions:
+            if frac in all_results[model] and all_results[model][frac]:
+                val = all_results[model][frac].get(metric_key, np.nan)
+                row.append(val if val is not None else np.nan)
+            else:
+                row.append(np.nan)
+        data.append(row)
+
+    # Convert to DataFrame
+    df = pd.DataFrame(
+        data,
+        index=[m.upper() for m in models],
+        columns=[f'{int(f*100)}%' for f in fractions]
+    )
+
+    # Create heatmap
+    fig, ax = plt.subplots(figsize=(10, 4))
+
+    # Reverse colormap if lower is better (e.g., for loss, mae, mse)
+    reverse_metrics = ['loss', 'mae', 'mse', 'rmse', 'test_loss', 'test_mae', 'test_mse', 'test_rmse']
+    if any(metric in metric_key.lower() for metric in reverse_metrics):
+        cmap = cmap + '_r'
+
+    sns.heatmap(
+        df,
+        annot=True,
+        fmt=annot_format,
+        cmap=cmap,
+        cbar_kws={'label': metric_key.replace('_', ' ').title()},
+        linewidths=0.5,
+        linecolor='gray',
+        vmin=vmin,
+        vmax=vmax,
+        ax=ax
+    )
+
+    ax.set_xlabel('Data Fraction', fontsize=12)
+    ax.set_ylabel('Model', fontsize=12)
+    ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
+
+    plt.tight_layout()
+    plt.show()
+

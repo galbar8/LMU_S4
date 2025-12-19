@@ -49,13 +49,16 @@ def train_one_epoch(
     pred_len = kwargs.get("pred_len")
     d_out = kwargs.get("d_out")
 
+    # Get device type string for amp_autocast
+    device_type = device.type if hasattr(device, 'type') else str(device)
+
     with Timer() as t:
         for batch in tqdm(loader, desc="train", leave=False):
             xb, yb, _ = _unpack_batch(batch)
             xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
 
             optimizer.zero_grad(set_to_none=True)
-            with amp_autocast(amp):
+            with amp_autocast(device_type, amp):
                 logits = model(xb)
                 if pred_len is not None and d_out is not None:
                     logits = logits.view(xb.size(0), pred_len, d_out)
@@ -123,11 +126,14 @@ def evaluate_one_epoch(
     pred_len = kwargs.get("pred_len")
     d_out = kwargs.get("d_out")
 
+    # Get device type string for amp_autocast
+    device_type = device.type if hasattr(device, 'type') else str(device)
+
     with Timer() as t:
         for batch in tqdm(loader, desc="val", leave=False):
             xb, yb, _ = _unpack_batch(batch)
             xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
-            with amp_autocast(amp):
+            with amp_autocast(device_type, amp):
                 logits = model(xb)
                 if pred_len is not None and d_out is not None:
                     logits = logits.view(xb.size(0), pred_len, d_out)

@@ -5,12 +5,37 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
+      <change afterPath="$PROJECT_DIR$/src/eval/eval_utils.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/block_factory.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/visualization.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/eval/compare.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/compare.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/eval/infer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/infer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_eval.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu_training.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu_training.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4_training.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4_training.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/etts/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_eval.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/utils.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_eval.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_s4.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_eval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_eval.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_eval.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/loops.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/loops.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/block_configs.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/checkpoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/common.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,7 +91,7 @@
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;ToolWindow.GitHub Copilot Chat.ShowToolbar&quot;: &quot;false&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;refactor&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/datasets/ppg/data&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -143,8 +168,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-PY-252.28539.27" />
+        <option value="bundled-python-sdk-07523f343e4f-968fe969f28a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.28539.27" />
       </set>
     </attachedChunks>
   </component>
@@ -177,7 +202,10 @@
       <workItem from="1763036916489" duration="81666000" />
       <workItem from="1764263184089" duration="2422000" />
       <workItem from="1764273299052" duration="79827000" />
-      <workItem from="1765568070430" duration="33088000" />
+      <workItem from="1765568070430" duration="39095000" />
+      <workItem from="1766077985504" duration="95000" />
+      <workItem from="1766078110448" duration="24318000" />
+      <workItem from="1766182715808" duration="1651000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -227,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765665758060</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1765919352963</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1765919352963</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
