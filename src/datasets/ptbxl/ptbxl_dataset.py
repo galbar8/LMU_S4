@@ -1,35 +1,19 @@
 from __future__ import annotations
 import ast
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Literal, Tuple, Optional, List, Dict
+from typing import Tuple, List, Dict
 
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import wfdb
 
-# 5 diagnostic superclasses (כמו במאמר/רפרנסים הרשמיים)
+from src.datasets.ptbxl.ptbxl_config import PTBXLConfig
+
 PTBXL_SUPERCLASSES = ["NORM", "MI", "STTC", "HYP", "CD"]
 
-
-@dataclass
-class PTBXLConfig:
-    root: str  # נתיב לתיקייה עם ה-CSV והתיקיות records100/records500
-    split: Literal["train_utils", "val", "test"] = "train_utils"
-    folds_train: Tuple[int, ...] = (1, 2, 3, 4, 5, 6, 7, 8)
-    fold_val: int = 9
-    fold_test: int = 10
-    sampling: Literal["lr100", "hr500"] = "lr100"  # 100Hz או 500Hz
-    leads: Optional[Iterable[int]] = None  # ברירת מחדל: כל 12 הלידים
-    length: Optional[int] = None  # אורך יעד (T); אם None – לא חותך/מרפד
-    normalize: Literal["per_lead_z", "none"] = "per_lead_z"
-    return_path: bool = False  # להחזיר גם את path יחסי (ל-debug)
-
-
 def _parse_scp_codes(s: str) -> Dict[str, float]:
-    # עמודת scp_codes ב-CSV היא dict כמחרוזת
     return ast.literal_eval(s)
 
 

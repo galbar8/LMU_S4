@@ -47,13 +47,6 @@ def make_block_cfg_ctor(
 
     Returns:
         Function that takes theta (sequence length) and returns BlockConfig
-
-    Example:
-        >>> lmu_cfg_ctor = make_block_cfg_ctor("lmu", memory_size=256)
-        >>> block_cfg = lmu_cfg_ctor(theta=500)
-
-        >>> s4_cfg_ctor = make_block_cfg_ctor("s4", d_state=64, bidirectional=True)
-        >>> block_cfg = s4_cfg_ctor(theta=500)
     """
     def block_cfg_ctor(theta: int) -> BlockConfig:
         if kind.lower() == "lmu":

@@ -94,18 +94,3 @@ def make_psmnist_loaders(
     print(f"  Classes: 10 (digits 0-9)")
 
     return train_loader, test_loader
-
-
-def get_psmnist_dimensions(
-    normalize: str = "standard"
-) -> Tuple[int, int, int]:
-    """
-    Get PS-MNIST dimensions without creating full dataset.
-
-    Returns:
-        seq_len: Sequence length (784)
-        input_dim: Input feature dimension (1)
-        num_classes: Number of classes (10)
-    """
-    return 784, 1, 10
-
