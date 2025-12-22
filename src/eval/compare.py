@@ -326,7 +326,7 @@ def plot_test_metric_comparison(
             if not np.isnan(val):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height,
-                       f'{val:.2f}',
+                       f'{val:.3f}',
                        ha='center', va='bottom', fontsize=9, fontweight='bold')
 
     ax.set_xlabel('Data Fraction', fontsize=12)

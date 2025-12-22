@@ -26,7 +26,9 @@ class AttentivePool(nn.Module):
 
 class SeqClassifier(nn.Module):
     """
-    Proj -> N×ResidualSeqBlock(core=LMU/S4) -> LN -> Pool -> Linear
+    [Embedding ->] Proj -> N×ResidualSeqBlock(core=LMU/S4) -> LN -> Pool -> Linear
+
+    Supports both continuous inputs (d_in dimensions) and discrete inputs (vocab_size tokens).
     """
     def __init__(
         self,
@@ -37,9 +39,18 @@ class SeqClassifier(nn.Module):
         block_factory: Callable[[int, float], nn.Module] = None,
         droppath_final: float = 0.1,
         pool: str = "mean",  # 'mean' (default) or 'attn'
+        vocab_size: int = None,  # If provided, use embedding layer
     ):
         super().__init__()
-        self.proj = nn.Linear(d_in, d_model)
+
+        # Handle discrete vs continuous inputs
+        self.use_embedding = vocab_size is not None
+        if self.use_embedding:
+            self.embedding = nn.Embedding(vocab_size, d_model)
+            self.proj = None  # No projection needed after embedding
+        else:
+            self.embedding = None
+            self.proj = nn.Linear(d_in, d_model)
 
         dps = torch.linspace(0, droppath_final, steps=depth).tolist()
         self.blocks = nn.ModuleList([block_factory(d_model, dps[i]) for i in range(depth)])
@@ -50,8 +61,13 @@ class SeqClassifier(nn.Module):
             self.attnpool = AttentivePool(d_model)
         self.head = nn.Linear(d_model, n_classes)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:  # (B,T,D_in)
-        x = self.proj(x)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # x: (B,T) for discrete inputs or (B,T,D_in) for continuous
+        if self.use_embedding:
+            x = self.embedding(x)  # (B,T) -> (B,T,d_model)
+        else:
+            x = self.proj(x)  # (B,T,D_in) -> (B,T,d_model)
+
         for b in self.blocks:
             x = b(x)
         x = self.norm(x)

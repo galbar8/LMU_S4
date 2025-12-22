@@ -5,21 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
-      <change afterPath="$PROJECT_DIR$/src/datasets/esc50/esc50_config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/datasets/ptbxl/ptbxl_config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/LRA/listOps/listops_config.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/LRA/listOps/listops_dataloader.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/datasets/LRA/listOps/listops_dataset.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/notebooks/listops/compare.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_lmu.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_s4.ipynb" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_task.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/psmnist/psmnist_dataloader.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/datasets/psmnist/psmnist_dataloader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/ptbxl/ptbxl_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/datasets/ptbxl/ptbxl_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/eval/compare.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/compare.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/v2/build_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/v2/build_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/v2/classifier.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/v2/classifier.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4_training.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4_training.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_eval.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_eval.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tasks/registry.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tasks/spec.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/train_utils/early_stopping.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/block_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/block_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/ema.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/trainer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,8 +34,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Jupyter Notebook" />
         <option value="Python Script" />
+        <option value="Jupyter Notebook" />
       </list>
     </option>
   </component>
@@ -63,33 +68,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python tests.Python tests in test_bidirectional.py.executor&quot;: &quot;Run&quot;,
-    &quot;Python.esc50.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.try.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;ToolWindow.GitHub Copilot Chat.ShowToolbar&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;refactor&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/datasets/ppg/data&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests in test_bidirectional.py.executor": "Run",
+    "Python.esc50.executor": "Run",
+    "Python.main.executor": "Debug",
+    "Python.try.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "ToolWindow.GitHub Copilot Chat.ShowToolbar": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "refactor",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/notebooks",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/datasets/LRA/listOps/data" />
       <recent name="$PROJECT_DIR$/src/datasets/ppg/data" />
       <recent name="$PROJECT_DIR$/src/datasets/etts/data" />
       <recent name="$PROJECT_DIR$/src/notebooks/ptbxl/saves" />
@@ -189,7 +195,7 @@
       <workItem from="1765568070430" duration="39095000" />
       <workItem from="1766077985504" duration="95000" />
       <workItem from="1766078110448" duration="24318000" />
-      <workItem from="1766182715808" duration="7927000" />
+      <workItem from="1766182715808" duration="33591000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -263,7 +269,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766184493871</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766229700776</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1766229700776</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

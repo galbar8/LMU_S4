@@ -80,12 +80,26 @@ class Trainer:
             n_classes = n_classes * pred_len
 
         block_cfg = args["block_cfg_ctor"](theta)
+
+        # Check if task provides vocab_size (for embedding-based inputs like ListOps)
+        vocab_size = None
+        if hasattr(self.task, 'get_vocab_size'):
+            try:
+                vocab_size = self.task.get_vocab_size(
+                    data_root=args["data_root"],
+                    **args.get("data_loader_kwargs", {})
+                )
+                print(f"Using embedding layer with vocab_size={vocab_size}")
+            except Exception as e:
+                print(f"Warning: Could not get vocab_size: {e}")
+
         self.model: nn.Module = self.model_builder(
             d_in=d_in,
             n_classes=n_classes,
             d_model=args["d_model"],
             depth=args["depth"],
             block_cfg=block_cfg,
+            vocab_size=vocab_size,
         ).to(self.device)
 
         # Optimiser and scheduler
@@ -109,11 +123,10 @@ class Trainer:
         else:
             self.sch = CosineAnnealingLR(self.opt, T_max=args["epochs"])
 
-        # AMP scaler
         if self.amp and self.device.type == "cuda":
             try:
                 self.scaler: Optional[torch.cuda.amp.GradScaler] = torch.amp.GradScaler(device="cuda", enabled=True)
-            except AttributeError:  # older PyTorch
+            except AttributeError:
                 self.scaler = torch.cuda.amp.GradScaler(enabled=True)
         else:
             self.scaler = None
@@ -323,12 +336,12 @@ class Trainer:
                     "args": save_args,
                     "history": self.history,
                 }, best_path)
-                print(f"💾 saved best model to {best_path}")
-                print(f"✅ new best {self.early_key} {self.best_metric:.4f}")
+                print(f"saved best model to {best_path}")
+                print(f"new best {self.early_key} {self.best_metric:.4f}")
 
             if should_stop:
                 print(
-                    f"⏹ Early stopping (patience={self.patience}, best={self.best_metric:.4f})."
+                    f"Early stopping (patience={self.patience}, best={self.best_metric:.4f})."
                 )
                 break
 
@@ -351,7 +364,7 @@ class Trainer:
 
         # Save final history to JSON file
         history_path = self.save_history(save_dir)
-        print(f"📊 Training history saved to {history_path}")
+        print(f"Training history saved to {history_path}")
 
         # Return best metric and checkpoint path
         return self.best_metric, best_path

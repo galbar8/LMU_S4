@@ -69,6 +69,7 @@ def build_model(
         d_model: int = 256,
         depth: int = 4,
         block_cfg: BlockConfig = BlockConfig(kind="lmu"),
+        vocab_size: int = None,  # For discrete token inputs (e.g., ListOps)
 ):
     block_factory = make_block_factory(block_cfg)
     return SeqClassifier(
@@ -79,4 +80,5 @@ def build_model(
         block_factory=block_factory,
         droppath_final=block_cfg.droppath_final,
         pool=block_cfg.pool,
+        vocab_size=vocab_size,
     )

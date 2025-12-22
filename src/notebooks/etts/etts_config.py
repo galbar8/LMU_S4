@@ -139,7 +139,7 @@ ettm2_config_lmu = {
 s4_base_params = {
     "d_state": 64,
     "channels": 1,
-    "bidirectional": False,  # Causal for forecasting
+    "bidirectional": False,
     "mode": "s4d",
     "dt_min": 1e-3,
     "dt_max": 1e-1,
