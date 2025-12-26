@@ -8,7 +8,6 @@ import torch
 from src.types.task_protocol import TaskProtocol
 from src.train_utils.trainer import Trainer
 
-
 def load_trainer_from_checkpoint(
     checkpoint_path: str,
     args: Dict[str, Any],

@@ -4,7 +4,7 @@ from typing import Dict, Any, Callable, Optional
 from tqdm import tqdm
 
 from src.utils.common import amp_autocast
-from src.utils.metrics import top1
+from src.eval.metrics import top1
 from src.utils.logging import Timer
 
 CLIP_NORM = 1.0

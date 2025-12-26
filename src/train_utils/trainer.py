@@ -22,7 +22,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from src.models.v2.build_model import build_model
 from src.train_utils.loops import train_one_epoch, evaluate_one_epoch
 from src.types.task_protocol import TaskProtocol
-from src.utils.metrics import multilabel_metrics_fn
+from src.eval.metrics import multilabel_metrics_fn
 from src.utils.subset_loaders import apply_fraction_to_loaders
 
 

@@ -5,68 +5,23 @@ import torch
 import numpy as np
 from tqdm.auto import tqdm
 from torch.amp import autocast as amp_autocast
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import roc_curve, auc, precision_recall_curve, confusion_matrix as sklearn_cm
 
 from src.types.task_protocol import TaskProtocol
-from src.models.v2.build_model import build_model
-from src.utils.checkpoint import load_trainer_from_checkpoint, save_test_results
+from src.utils.checkpoint import save_test_results, load_trainer_from_checkpoint
 from src.eval.infer import predict_loader
-from src.eval.metrics import confusion_matrix, per_class_accuracy
+from src.eval.metrics import confusion_matrix, per_class_accuracy, multilabel_metrics_fn
 from src.eval.report import print_basic_report, plot_confusion, print_per_class
 from src.utils.common import amp_autocast as amp_ctx
-from src.utils.metrics import multilabel_metrics_fn
-
-
-def load_model_from_checkpoint(
-    args: Dict[str, Any],
-    task: TaskProtocol,
-    checkpoint_path: str,
-) -> torch.nn.Module:
-    """
-    Load model from checkpoint.
-
-    Args:
-        args: Training arguments dictionary
-        task: Task protocol instance
-        checkpoint_path: Path to the checkpoint file
-
-    Returns:
-        Loaded model
-    """
-    device = args.get("device", torch.device("cpu"))
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-
-    # Infer model dimensions from task and args
-    flat_args = dict(args)
-    flat_args.update(args.get("data_loader_kwargs", {}))
-    d_in = task.infer_input_dim(flat_args)
-    d_out = task.infer_num_classes(flat_args)
-    theta = task.infer_theta(flat_args)
-
-    # For time series forecasting (ETTS), n_classes = d_out * pred_len
-    # For classification tasks, n_classes = d_out
-    pred_len = flat_args.get("pred_len", None)
-    if pred_len is not None and task.problem_type == "regression":
-        n_classes = d_out * pred_len
-    else:
-        n_classes = d_out
-
-    # Re-create model architecture
-    block_cfg = args["block_cfg_ctor"](theta)
-    model = build_model(
-        d_in=d_in,
-        n_classes=n_classes,
-        d_model=args["d_model"],
-        depth=args["depth"],
-        block_cfg=block_cfg
-    ).to(device)
-
-    model.load_state_dict(checkpoint["model"])
-    model.eval()
-
-    print(f"✅ Loaded checkpoint from epoch {checkpoint.get('epoch', 'N/A')}")
-
-    return model
-
+from src.utils.visualization import (
+    plot_roc_curve,
+    plot_precision_recall_curve,
+    plot_confusion_matrix_binary,
+    plot_threshold_analysis,
+    plot_metrics_summary,
+    plot_class_distribution,
+)
 
 def compute_classification_metrics(
     logits: torch.Tensor,
@@ -193,7 +148,7 @@ def evaluate_classification_model(
     # Save results if requested
     if save_results and use_test_set:
         results_path = save_test_results(best_model_path, results)
-        print(f"\n✅ {set_name.capitalize()} results saved to: {results_path}")
+        print(f"\n {set_name.capitalize()} results saved to: {results_path}")
 
     acc = results['accuracy']
     loss = results['loss']
@@ -205,6 +160,17 @@ def evaluate_classification_model(
     print(f"{set_name.upper()} SET RESULTS")
     print("=" * 50)
     print_basic_report(acc, num_classes=num_classes)
+
+    if num_classes == 2:
+        # Binary classification detailed results
+        plot_binary_classification_results(
+            all_logits,
+            all_labels,
+            class_names=None,
+            set_name=set_name.capitalize()
+        )
+
+        return all_logits, all_labels
 
     # Confusion matrix
     cm = confusion_matrix(all_logits, all_labels, num_classes=num_classes)
@@ -250,8 +216,13 @@ def evaluate_regression_model(
         **args["data_loader_kwargs"]
     )
 
-    # Load model
-    model = load_model_from_checkpoint(args, task, best_model_path)
+    trainer = load_trainer_from_checkpoint(
+        checkpoint_path=best_model_path,
+        args=args,
+        task=task,
+    )
+    model = trainer.model.to(args["device"])
+    model.eval()
 
     # Print validation metrics from checkpoint
     val_metrics = checkpoint.get('val', {})
@@ -344,8 +315,13 @@ def evaluate_multilabel_model(
         **args.get("data_loader_kwargs", {})
     )
 
-    # Load model
-    model = load_model_from_checkpoint(args, task, best_model_path)
+    trainer = load_trainer_from_checkpoint(
+        checkpoint_path=best_model_path,
+        args=args,
+        task=task,
+    )
+    model = trainer.model.to(args["device"])
+    model.eval()
 
     device = args.get("device", torch.device("cpu"))
     amp = args.get("amp", False) and device.type in {"cuda", "mps"}
@@ -444,4 +420,88 @@ def print_multilabel_evaluation_results(
         f1 = 2 * precision * recall / (precision + recall + 1e-8)
 
         print(f"{name:10s}: F1={f1:.4f}, P={precision:.4f}, R={recall:.4f}")
+
+
+def plot_binary_classification_results(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    class_names: Optional[Tuple[str, str]] = None,
+    set_name: str = "Test"
+) -> Dict[str, Any]:
+    """
+    Create comprehensive visualizations for binary classification.
+
+    This function generates 8 separate plots (each in its own figure) for analyzing
+    binary classification performance.
+
+    Args:
+        logits: Model predictions (logits) [N, 2]
+        labels: Ground truth labels [N]
+        class_names: Tuple of (negative_class_name, positive_class_name)
+        set_name: Name of the dataset (e.g., "Test", "Validation")
+
+    Returns:
+        Dictionary containing computed metrics
+    """
+    if class_names is None:
+        class_names = ("Not Duplicate", "Duplicate")
+
+    # Convert to numpy
+    labels_np = labels.cpu().numpy()
+    probs = torch.softmax(logits, dim=-1)[:, 1].cpu().numpy()
+    preds = logits.argmax(dim=-1).cpu().numpy()
+
+    # Compute metrics
+    accuracy = accuracy_score(labels_np, preds)
+    precision = precision_score(labels_np, preds, zero_division=0)
+    recall = recall_score(labels_np, preds, zero_division=0)
+    f1 = f1_score(labels_np, preds, zero_division=0)
+
+    # Compute AUC scores
+    fpr, tpr, _ = roc_curve(labels_np, probs)
+    roc_auc = auc(fpr, tpr)
+
+    precision_curve, recall_curve, _ = precision_recall_curve(labels_np, probs)
+    pr_auc = auc(recall_curve, precision_curve)
+
+    # Get confusion matrix
+    cm = sklearn_cm(labels_np, preds)
+    tn, fp, fn, tp = cm.ravel()
+
+    print("\n1. ROC Curve...")
+    plot_roc_curve(labels_np, probs, set_name)
+
+    print("2. Precision-Recall Curve...")
+    plot_precision_recall_curve(labels_np, probs, set_name)
+
+    print("3. Confusion Matrix...")
+    plot_confusion_matrix_binary(labels_np, preds, class_names, set_name)
+
+    print("4. Threshold Analysis...")
+    plot_threshold_analysis(labels_np, probs)
+
+    print("5. Metrics Summary...")
+    plot_metrics_summary(accuracy, precision, recall, f1)
+
+    print("6. Class Distribution...")
+    plot_class_distribution(labels_np, class_names, set_name)
+
+    print("\n" + "=" * 60)
+    print("All visualizations generated!")
+    print("=" * 60)
+
+    # Return metrics dictionary
+    return {
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1_score': f1,
+        'roc_auc': roc_auc,
+        'pr_auc': pr_auc,
+        'confusion_matrix': cm.tolist(),
+        'true_negatives': int(tn),
+        'false_positives': int(fp),
+        'false_negatives': int(fn),
+        'true_positives': int(tp),
+    }
 
