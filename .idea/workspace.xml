@@ -4,14 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
+    <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="Add binary metrics">
+      <change afterPath="$PROJECT_DIR$/src/notebooks/research.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/eval/compare.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/compare.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/eval/eval_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/eval_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/eval/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/loops.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/loops.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/train_utils/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/trainer.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -186,7 +182,7 @@
       <workItem from="1766078110448" duration="24318000" />
       <workItem from="1766182715808" duration="62100000" />
       <workItem from="1766698592805" duration="1454000" />
-      <workItem from="1766700129265" duration="13081000" />
+      <workItem from="1766700129265" duration="24451000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -292,7 +288,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766784287230</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Add binary metrics">
+      <option name="closed" value="true" />
+      <created>1766831200832</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1766831200832</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -311,7 +315,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="WIP" />
-    <option name="LAST_COMMIT_MESSAGE" value="WIP" />
+    <MESSAGE value="Add binary metrics" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add binary metrics" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/LMU_S4$try.coverage" NAME="try Coverage Results" MODIFIED="1757962258417" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/notebooks" />

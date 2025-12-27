@@ -131,8 +131,6 @@ class Trainer:
         else:
             self.scaler = None
 
-        # Exponential moving average (optional)
-        self.ema = None  # can be replaced with an EMA object if desired
         # Logging (stubbed out; replace with your own logger if needed)
         self.tb = None
 
@@ -281,7 +279,6 @@ class Trainer:
                 self.device,
                 self.amp,
                 self.criterion,
-                self.ema,
                 metrics_fn=self.metrics_fn,
                 **loop_kwargs,
             )
@@ -292,7 +289,6 @@ class Trainer:
                 self.device,
                 self.amp,
                 self.criterion,
-                self.ema,
                 metrics_fn=self.metrics_fn,
                 **loop_kwargs,
             )

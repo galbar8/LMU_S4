@@ -29,7 +29,6 @@ def train_one_epoch(
     device: torch.device,
     amp: bool,
     lossfn: nn.Module,
-    ema = None,
     *,
     metrics_fn: Optional[Callable[[torch.Tensor, torch.Tensor], Dict[str, float]]] = None,
     grad_clip: float = CLIP_NORM,
@@ -91,8 +90,6 @@ def train_one_epoch(
                     sums[k] = sums.get(k, 0.0) + float(v) * bs
 
             n += bs
-            if ema is not None:
-                ema.update(model)
 
     out = {"loss": tot_loss / n, "time_s": t.dt, "lr": current_lr(optimizer), "stepped": saw_opt_step}
     # finalize averages
@@ -107,7 +104,6 @@ def evaluate_one_epoch(
     device: torch.device,
     amp: bool,
     loss_fn: nn.Module,
-    ema = None,
     *,
     metrics_fn: Optional[Callable[[torch.Tensor, torch.Tensor], Dict[str, float]]] = None,
     **kwargs,
@@ -115,8 +111,6 @@ def evaluate_one_epoch(
     """
     See train_one_epoch for metrics_fn contract.
     """
-    if ema is not None:
-        ema.apply(model)
 
     model.eval()
     tot_loss = 0.0
@@ -151,8 +145,6 @@ def evaluate_one_epoch(
 
             n += bs
 
-    if ema is not None:
-        ema.restore(model)
 
     out = {"loss": tot_loss / n, "time_s": t.dt}
     for k, v in sums.items():
