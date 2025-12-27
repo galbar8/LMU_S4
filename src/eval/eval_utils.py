@@ -1,6 +1,6 @@
 """Unified evaluation utilities for all tasks."""
 from __future__ import annotations
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple, Optional, List, Literal
 import torch
 import numpy as np
 from tqdm.auto import tqdm
@@ -11,7 +11,16 @@ from sklearn.metrics import roc_curve, auc, precision_recall_curve, confusion_ma
 from src.types.task_protocol import TaskProtocol
 from src.utils.checkpoint import save_test_results, load_trainer_from_checkpoint
 from src.eval.infer import predict_loader
-from src.eval.metrics import confusion_matrix, per_class_accuracy, multilabel_metrics_fn
+from src.eval.metrics import (
+    confusion_matrix,
+    per_class_accuracy,
+    multilabel_metrics_fn,
+    compute_f1_score,
+    compute_precision,
+    compute_recall,
+    compute_roc_auc,
+    compute_pr_auc,
+)
 from src.eval.report import print_basic_report, plot_confusion, print_per_class
 from src.utils.common import amp_autocast as amp_ctx
 from src.utils.visualization import (
@@ -23,10 +32,52 @@ from src.utils.visualization import (
     plot_class_distribution,
 )
 
+Metrics = Literal['f1_score', 'precision', 'recall', 'roc_auc', 'pr_auc']
+
+def _compute_optional_metrics(
+    logits: torch.Tensor,
+    labels: torch.Tensor,
+    metrics_to_compute: List[Metrics],
+    average: str = 'binary'
+) -> Dict[str, float]:
+    """
+    Helper function to compute optional metrics based on a list of metric names.
+
+    Args:
+        logits: Model predictions (logits)
+        labels: Ground truth labels
+        metrics_to_compute: List of metric names to compute
+        average: Averaging strategy for multiclass metrics
+
+    Returns:
+        Dictionary containing computed metrics
+    """
+    METRIC_FUNCTIONS = {
+        'f1_score': compute_f1_score,
+        'precision': compute_precision,
+        'recall': compute_recall,
+        'roc_auc': compute_roc_auc,
+        'pr_auc': compute_pr_auc,
+    }
+
+    results = {}
+    for metric_name in metrics_to_compute:
+        if metric_name in METRIC_FUNCTIONS:
+            metric_fn = METRIC_FUNCTIONS[metric_name]
+            if metric_name in ['roc_auc', 'pr_auc']:
+                results[metric_name] = metric_fn(logits, labels)
+            else:
+                results[metric_name] = metric_fn(logits, labels, average=average)
+
+    return results
+
+
 def compute_classification_metrics(
     logits: torch.Tensor,
     labels: torch.Tensor,
     num_classes: int,
+    additional_metrics: Optional[List[Metrics]] = None,
+    average: str = 'binary',
 ) -> Dict[str, Any]:
     """
     Compute evaluation metrics for classification tasks.
@@ -35,6 +86,10 @@ def compute_classification_metrics(
         logits: Model predictions (logits)
         labels: Ground truth labels
         num_classes: Number of classes
+        additional_metrics: List of additional metrics to compute.
+                          Options: ['f1_score', 'precision', 'recall', 'roc_auc', 'pr_auc']
+                          If None, only accuracy and loss are computed.
+        average: Averaging strategy for metrics ('binary', 'macro', 'micro', 'weighted')
 
     Returns:
         Dictionary containing metrics
@@ -59,6 +114,12 @@ def compute_classification_metrics(
         },
         'num_samples': len(labels),
     }
+
+    if additional_metrics:
+        optional_metrics = _compute_optional_metrics(
+            logits, labels, additional_metrics, average=average
+        )
+        results.update(optional_metrics)
 
     return results
 
@@ -91,6 +152,44 @@ def compute_regression_metrics(
     return results
 
 
+def _print_metrics_report(results: Dict[str, Any], set_name: str):
+    """
+    Helper function to print metrics in a clean, organized format.
+
+    Args:
+        results: Dictionary containing computed metrics
+        set_name: Name of the dataset (e.g., "test", "validation")
+    """
+    print("\n" + "=" * 50)
+    print(f"{set_name.upper()} SET RESULTS")
+    print("=" * 50)
+
+    CORE_METRICS = [
+        ('Accuracy', 'accuracy', '.4f'),
+        ('Loss', 'loss', '.4f'),
+    ]
+
+    OPTIONAL_METRICS = [
+        ('F1-Score', 'f1_score', '.4f'),
+        ('Precision', 'precision', '.4f'),
+        ('Recall', 'recall', '.4f'),
+        ('ROC-AUC', 'roc_auc', '.4f'),
+        ('PR-AUC', 'pr_auc', '.4f'),
+    ]
+
+    for label, key, fmt in CORE_METRICS:
+        if key in results:
+            value = results[key]
+            if key == 'accuracy':
+                print(f"   {label}: {value:{fmt}} ({value*100:.2f}%)")
+            else:
+                print(f"   {label}: {value:{fmt}}")
+
+    for label, key, fmt in OPTIONAL_METRICS:
+        if key in results:
+            print(f"   {label}: {results[key]:{fmt}}")
+
+
 @torch.inference_mode()
 def evaluate_classification_model(
     args: Dict[str, Any],
@@ -99,6 +198,7 @@ def evaluate_classification_model(
     num_classes: int,
     save_results: bool = True,
     use_test_set: bool = False,
+    additional_metrics: Optional[List[Metrics]] = None,
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Evaluate classification model on validation or test set.
@@ -110,7 +210,8 @@ def evaluate_classification_model(
         num_classes: Number of classes
         save_results: Whether to save results to JSON file
         use_test_set: If True, use test set; if False, use validation set
-
+        additional_metrics: List of additional metrics to compute.
+                          Options: ['f1_score', 'precision', 'recall', 'roc_auc', 'pr_auc']
     Returns:
         Tuple of (logits, labels)
     """
@@ -142,24 +243,26 @@ def evaluate_classification_model(
         args["amp"]
     )
 
+    # Determine averaging strategy
+    average = 'binary' if num_classes == 2 else 'macro'
+
     # Compute metrics
-    results = compute_classification_metrics(all_logits, all_labels, num_classes)
+    results = compute_classification_metrics(
+        all_logits,
+        all_labels,
+        num_classes,
+        additional_metrics=additional_metrics,
+        average=average
+    )
 
     # Save results if requested
     if save_results and use_test_set:
         results_path = save_test_results(best_model_path, results)
         print(f"\n {set_name.capitalize()} results saved to: {results_path}")
 
-    acc = results['accuracy']
-    loss = results['loss']
-    print(f"\n   {set_name.capitalize()} Accuracy: {acc:.4f} ({acc*100:.2f}%)")
-    print(f"   {set_name.capitalize()} Loss: {loss:.4f}")
-
-    # Print basic metrics
-    print("\n" + "=" * 50)
-    print(f"{set_name.upper()} SET RESULTS")
-    print("=" * 50)
-    print_basic_report(acc, num_classes=num_classes)
+    # Print metrics using helper function
+    _print_metrics_report(results, set_name)
+    print_basic_report(results['accuracy'], num_classes=num_classes)
 
     if num_classes == 2:
         # Binary classification detailed results

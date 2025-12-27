@@ -148,12 +148,10 @@ class Trainer:
                 "val_loss": [], "val_acc": [], "val_f1_micro": [],
             }
         elif self.task.problem_type == "multilabel":
-            # Multi‑label tasks expect binary targets per class
-
             pos_weight = None
             if args.get("pos_weight", None) is not None:
                 pos_weight = self.compute_pos_weights().to(self.device)
-                print(f"📊 Computed pos_weight for imbalanced classes: {pos_weight.cpu().numpy()}")
+                print(f"Computed pos_weight for imbalanced classes: {pos_weight.cpu().numpy()}")
 
             self.criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
             thr = float(args.get("threshold", 0.5))

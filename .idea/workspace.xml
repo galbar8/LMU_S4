@@ -5,22 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
-      <change afterPath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_s4.ipynb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_task.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/ppg/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/eval/compare.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/compare.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/eval/eval_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/eval_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/eval/metrics.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/metrics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_task.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/train_utils/loops.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/loops.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_s4.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/train_utils/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/trainer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/checkpoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/checkpoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/metrics.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/visualization.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -194,7 +186,7 @@
       <workItem from="1766078110448" duration="24318000" />
       <workItem from="1766182715808" duration="62100000" />
       <workItem from="1766698592805" duration="1454000" />
-      <workItem from="1766700129265" duration="8848000" />
+      <workItem from="1766700129265" duration="13081000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -292,7 +284,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766438085726</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766784287230</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1766784287230</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

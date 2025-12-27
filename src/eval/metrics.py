@@ -12,6 +12,10 @@ from sklearn.metrics import (
     accuracy_score,
     confusion_matrix as sklearn_confusion_matrix,
     f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+    average_precision_score,
     mean_absolute_error,
     mean_squared_error,
     r2_score,
@@ -90,6 +94,120 @@ def per_class_accuracy(cm: torch.Tensor) -> torch.Tensor:
     correct = cm.diag()
     totals = cm.sum(dim=1).clamp_min(1)
     return correct.float() / totals.float()
+
+
+@torch.no_grad()
+def compute_f1_score(logits: torch.Tensor, y: torch.Tensor, average: str = 'binary') -> float:
+    """
+    Compute F1 score using sklearn.
+
+    Args:
+        logits: Model predictions (logits) [N, num_classes] or [N]
+        y: Ground truth labels [N]
+        average: Averaging strategy ('binary', 'micro', 'macro', 'weighted')
+
+    Returns:
+        F1 score (0-1)
+    """
+    pred = logits.argmax(dim=-1).cpu().numpy()
+    y_np = y.cpu().numpy()
+    return float(f1_score(y_np, pred, average=average, zero_division=0))
+
+
+@torch.no_grad()
+def compute_precision(logits: torch.Tensor, y: torch.Tensor, average: str = 'binary') -> float:
+    """
+    Compute precision using sklearn.
+
+    Args:
+        logits: Model predictions (logits) [N, num_classes] or [N]
+        y: Ground truth labels [N]
+        average: Averaging strategy ('binary', 'micro', 'macro', 'weighted')
+
+    Returns:
+        Precision score (0-1)
+    """
+    pred = logits.argmax(dim=-1).cpu().numpy()
+    y_np = y.cpu().numpy()
+    return float(precision_score(y_np, pred, average=average, zero_division=0))
+
+
+@torch.no_grad()
+def compute_recall(logits: torch.Tensor, y: torch.Tensor, average: str = 'binary') -> float:
+    """
+    Compute recall using sklearn.
+
+    Args:
+        logits: Model predictions (logits) [N, num_classes] or [N]
+        y: Ground truth labels [N]
+        average: Averaging strategy ('binary', 'micro', 'macro', 'weighted')
+
+    Returns:
+        Recall score (0-1)
+    """
+    pred = logits.argmax(dim=-1).cpu().numpy()
+    y_np = y.cpu().numpy()
+    return float(recall_score(y_np, pred, average=average, zero_division=0))
+
+
+@torch.no_grad()
+def compute_roc_auc(logits: torch.Tensor, y: torch.Tensor) -> float:
+    """
+    Compute ROC-AUC score using sklearn.
+    Only applicable for binary classification.
+
+    Args:
+        logits: Model predictions (logits) [N, 2]
+        y: Ground truth labels [N] (values should be 0 or 1)
+
+    Returns:
+        ROC-AUC score (0-1), or 0.0 if computation fails
+    """
+    # Extract probability for positive class
+    if logits.dim() == 2 and logits.size(1) == 2:
+        probs = torch.softmax(logits, dim=-1)[:, 1].cpu().numpy()
+    elif logits.dim() == 2 and logits.size(1) == 1:
+        probs = torch.sigmoid(logits.squeeze(-1)).cpu().numpy()
+    else:
+        probs = torch.sigmoid(logits).cpu().numpy()
+
+    y_np = y.cpu().numpy()
+
+    try:
+        return float(roc_auc_score(y_np, probs))
+    except ValueError:
+        # Happens when only one class is present in y_true
+        return 0.0
+
+
+@torch.no_grad()
+def compute_pr_auc(logits: torch.Tensor, y: torch.Tensor) -> float:
+    """
+    Compute Precision-Recall AUC score using sklearn.
+    Only applicable for binary classification.
+
+    Args:
+        logits: Model predictions (logits) [N, 2]
+        y: Ground truth labels [N] (values should be 0 or 1)
+
+    Returns:
+        PR-AUC score (0-1), or 0.0 if computation fails
+    """
+    # Extract probability for positive class
+    if logits.dim() == 2 and logits.size(1) == 2:
+        probs = torch.softmax(logits, dim=-1)[:, 1].cpu().numpy()
+    elif logits.dim() == 2 and logits.size(1) == 1:
+        probs = torch.sigmoid(logits.squeeze(-1)).cpu().numpy()
+    else:
+        probs = torch.sigmoid(logits).cpu().numpy()
+
+    y_np = y.cpu().numpy()
+
+    try:
+        return float(average_precision_score(y_np, probs))
+    except ValueError:
+        # Happens when only one class is present in y_true
+        return 0.0
 
 
 # ==============================================================================

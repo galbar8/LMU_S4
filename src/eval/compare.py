@@ -56,14 +56,13 @@ def load_run_results(run_dir: str) -> Dict[str, Any]:
 
     # Load test metrics from saved test_results.json
     saved_test_results = load_test_results(str(checkpoint_path))
+
     if saved_test_results:
         # For regression tasks (PPG, ETTS)
         results['test_mse'] = saved_test_results.get('mse')
         results['test_mae'] = saved_test_results.get('mae')
         results['test_rmse'] = saved_test_results.get('rmse')
 
-        # For classification tasks (PS-MNIST, ESC-50, PTB-XL)
-        # Note: JSON saves as 'accuracy' and 'loss', not 'test_accuracy' and 'test_loss'
         results['accuracy'] = saved_test_results.get('accuracy')
         results['loss'] = saved_test_results.get('loss')
         results['per_class_accuracy'] = saved_test_results.get('per_class_accuracy')
@@ -71,6 +70,13 @@ def load_run_results(run_dir: str) -> Dict[str, Any]:
         # For multi-label classification (PTB-XL)
         results['test_f1_micro'] = saved_test_results.get('f1_micro')
         results['threshold'] = saved_test_results.get('threshold')
+
+        # For classification tasks
+        results['f1_score'] = saved_test_results.get('f1_score')
+        results['precision'] = saved_test_results.get('precision')
+        results['recall'] = saved_test_results.get('recall')
+        results['pr_auc'] = saved_test_results.get('pr_auc')
+        results['roc_auc'] = saved_test_results.get('roc_auc')
 
         # Number of samples
         results['num_test_samples'] = saved_test_results.get('num_samples') or saved_test_results.get('num_test_samples')
