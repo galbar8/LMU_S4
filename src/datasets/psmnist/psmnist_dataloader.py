@@ -79,7 +79,7 @@ def make_psmnist_loaders(
     test_loader = DataLoader(
         test_dataset,
         batch_size=batch_size,
-        shuffle=False,  # Don't shuffle test data
+        shuffle=False,
         num_workers=num_workers,
         pin_memory=pin_memory,
         persistent_workers=pw,
