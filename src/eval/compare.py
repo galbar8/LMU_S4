@@ -191,6 +191,7 @@ def plot_metric_comparison_bar(
 ):
     """
     Create bar chart comparing a metric across models and fractions.
+    Dynamically adjusts to handle any number of models.
 
     Args:
         all_results: Results from load_all_experiments()
@@ -202,11 +203,24 @@ def plot_metric_comparison_bar(
     fractions = sorted(set(f for model_results in all_results.values()
                           for f in model_results.keys()))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    n_models = len(models)
+
+    # Dynamic figure sizing
+    fig_width = max(12, len(fractions) * 2 + 4)
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
 
     x = np.arange(len(fractions))
-    width = 0.35
-    colors = {'s4': '#1f77b4', 'lmu': '#ff7f0e'}
+
+    # Dynamically calculate bar width
+    total_width = 0.8
+    width = total_width / n_models if n_models > 0 else 0.8
+
+    # Dynamic color palette
+    if n_models <= 3:
+        color_map = {'s4': '#1f77b4', 'lmu': '#ff7f0e', 'mamba': '#2ca02c'}
+        colors = [color_map.get(model.lower(), plt.cm.tab10(i)) for i, model in enumerate(models)]
+    else:
+        colors = plt.cm.tab10(np.linspace(0, 1, n_models))
 
     for i, model in enumerate(models):
         values = []
@@ -217,26 +231,33 @@ def plot_metric_comparison_bar(
             else:
                 values.append(np.nan)
 
-        offset = width * (i - len(models)/2 + 0.5)
+        offset = width * (i - n_models/2 + 0.5)
         bars = ax.bar(x + offset, values, width,
                      label=model.upper(),
                      alpha=0.8,
-                     color=colors.get(model.lower(), '#2ca02c'))
+                     color=colors[i])
 
-        # Add value labels on bars
+        # Add value labels on bars with dynamic font size
+        font_size = max(7, 9 - n_models // 2)
         for j, (bar, val) in enumerate(zip(bars, values)):
             if not np.isnan(val):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height * 0.5,
                        f'{val:.2f}',
-                       ha='center', va='bottom', fontsize=9)
+                       ha='center', va='bottom', fontsize=font_size)
 
     ax.set_xlabel('Data Fraction', fontsize=12)
     ax.set_ylabel(ylabel, fontsize=12)
     ax.set_title(title, fontsize=14, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels([f'{int(f*100)}%' for f in fractions])
-    ax.legend(fontsize=11)
+
+    # Adjust legend
+    if n_models <= 4:
+        ax.legend(fontsize=11, loc='best')
+    else:
+        ax.legend(fontsize=9, loc='best', ncol=min(3, (n_models + 2) // 3))
+
     ax.grid(True, alpha=0.3, axis='y')
 
     plt.tight_layout()
@@ -295,6 +316,7 @@ def plot_test_metric_comparison(
 ):
     """
     Create bar chart comparing test metrics across models and fractions.
+    Dynamically adjusts to handle any number of models.
 
     Args:
         all_results: Results from load_all_experiments()
@@ -306,11 +328,27 @@ def plot_test_metric_comparison(
     fractions = sorted(set(f for model_results in all_results.values()
                           for f in model_results.keys()))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    n_models = len(models)
+
+    # Dynamic figure sizing based on number of fractions
+    fig_width = max(12, len(fractions) * 2 + 4)
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
 
     x = np.arange(len(fractions))
-    width = 0.35
-    colors = {'s4': '#1f77b4', 'lmu': '#ff7f0e'}
+
+    # Dynamically calculate bar width based on number of models
+    # Ensure bars don't overlap and leave space between groups
+    total_width = 0.8  # Total width for all bars in a group
+    width = total_width / n_models if n_models > 0 else 0.8
+
+    # Use a color palette that scales with number of models
+    if n_models <= 3:
+        # Use predefined colors for common cases
+        color_map = {'s4': '#1f77b4', 'lmu': '#ff7f0e', 'mamba': '#2ca02c'}
+        colors = [color_map.get(model.lower(), plt.cm.tab10(i)) for i, model in enumerate(models)]
+    else:
+        # Use colormap for many models
+        colors = plt.cm.tab10(np.linspace(0, 1, n_models))
 
     for i, model in enumerate(models):
         values = []
@@ -321,26 +359,36 @@ def plot_test_metric_comparison(
             else:
                 values.append(np.nan)
 
-        offset = width * (i - len(models)/2 + 0.5)
+        # Center the bars around each x position
+        offset = width * (i - n_models/2 + 0.5)
         bars = ax.bar(x + offset, values, width,
                      label=model.upper(),
                      alpha=0.8,
-                     color=colors.get(model.lower(), '#2ca02c'))
+                     color=colors[i])
 
         # Add value labels on bars
+        # Adjust font size based on number of models
+        font_size = max(7, 9 - n_models // 2)
         for j, (bar, val) in enumerate(zip(bars, values)):
             if not np.isnan(val):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height,
                        f'{val:.3f}',
-                       ha='center', va='bottom', fontsize=9, fontweight='bold')
+                       ha='center', va='bottom', fontsize=font_size, fontweight='bold')
 
     ax.set_xlabel('Data Fraction', fontsize=12)
     ax.set_ylabel(ylabel, fontsize=12)
     ax.set_title(title, fontsize=14, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels([f'{int(f*100)}%' for f in fractions])
-    ax.legend(fontsize=11)
+
+    # Adjust legend based on number of models
+    if n_models <= 4:
+        ax.legend(fontsize=11, loc='best')
+    else:
+        # Use smaller font and multiple columns for many models
+        ax.legend(fontsize=9, loc='best', ncol=min(3, (n_models + 2) // 3))
+
     ax.grid(True, alpha=0.3, axis='y')
 
     plt.tight_layout()
@@ -354,6 +402,7 @@ def plot_test_data_efficiency(
 ):
     """
     Plot test metric vs data fraction to show data efficiency on test set.
+    Dynamically adjusts to handle any number of models.
 
     Args:
         all_results: Results from load_all_experiments()
@@ -361,13 +410,24 @@ def plot_test_data_efficiency(
         ylabel: Y-axis label
     """
     models = list(all_results.keys())
+    n_models = len(models)
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    colors = {'s4': '#1f77b4', 'lmu': '#ff7f0e'}
-    markers = {'s4': 'o', 'lmu': 's'}
+    # Extended color and marker palettes
+    color_map = {'s4': '#1f77b4', 'lmu': '#ff7f0e', 'mamba': '#2ca02c'}
+    marker_map = {'s4': 'o', 'lmu': 's', 'mamba': '^'}
 
-    for model in models:
+    # Generate colors and markers for all models
+    if n_models <= 3:
+        colors = [color_map.get(m.lower(), plt.cm.tab10(i)) for i, m in enumerate(models)]
+        markers = [marker_map.get(m.lower(), ['o', 's', '^', 'D', 'v', '*'][i % 6]) for i, m in enumerate(models)]
+    else:
+        colors = plt.cm.tab10(np.linspace(0, 1, n_models))
+        markers = ['o', 's', '^', 'D', 'v', '*', 'p', 'h', '<', '>']
+        markers = [markers[i % len(markers)] for i in range(n_models)]
+
+    for i, model in enumerate(models):
         fractions = []
         values = []
 
@@ -381,17 +441,23 @@ def plot_test_data_efficiency(
         if fractions:
             ax.plot(fractions, values,
                    label=model.upper(),
-                   marker=markers.get(model.lower(), 'o'),
+                   marker=markers[i],
                    markersize=10,
                    linewidth=2.5,
-                   color=colors.get(model.lower(), '#2ca02c'),
+                   color=colors[i],
                    alpha=0.8)
 
     ax.set_xlabel('Training Data (%)', fontsize=12)
     ax.set_ylabel(ylabel, fontsize=12)
     ax.set_title('Test Set Performance: Data Efficiency Comparison',
                  fontsize=14, fontweight='bold')
-    ax.legend(fontsize=11, loc='best')
+
+    # Adjust legend based on number of models
+    if n_models <= 4:
+        ax.legend(fontsize=11, loc='best')
+    else:
+        ax.legend(fontsize=9, loc='best', ncol=min(2, (n_models + 1) // 2))
+
     ax.grid(True, alpha=0.3)
     ax.set_xticks([10, 25, 50, 100])
 
