@@ -206,7 +206,7 @@ def make_mamba_block_cfg_ctor(
     expand_factor: int = 2,
     d_conv: int = 4,
     dt_min: float = 0.001,
-    dt_max: float = 0.1,
+    dt_max: float = 0.01,
     use_external_mlp: bool = True,
     dropout: float = 0.2,
     mlp_ratio: float = 2.0,

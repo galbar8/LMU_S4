@@ -41,6 +41,11 @@ class MambaCoreAdapter(BaseSeqCore):
         )
         self.mamba = Mamba(cfg)
 
+        # Learnable output scaling for numerical stability
+        # Initialized very small (0.01) to prevent exploding activations
+        # This is more conservative than 0.1 and helps after initial epochs
+        self.output_scale = torch.nn.Parameter(torch.ones(1) * 0.1)
+
     def forward(
         self,
         x: torch.Tensor,
@@ -48,7 +53,10 @@ class MambaCoreAdapter(BaseSeqCore):
         mask: Optional[torch.Tensor] = None,
         cache: Optional[dict] = None,
     ) -> torch.Tensor:
-        return self.mamba(x)
+        out = self.mamba(x)
+        # Apply learnable scaling - prevents exploding activations
+        # while allowing model to adapt the scale during training
+        return out * self.output_scale
 
     @property
     def d_output(self) -> int:

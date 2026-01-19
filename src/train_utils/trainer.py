@@ -103,10 +103,32 @@ class Trainer:
         ).to(self.device)
 
         # Optimiser and scheduler
+        # Exclude SSM/dt-specific parameters from weight decay to prevent unstable dynamics
+        # Based on Mamba best practices and ODE/SSM literature
+        no_decay = [
+            "bias",         # Standard: biases don't need regularization
+            "norm",         # Standard: normalization layer parameters
+            "A_log",        # Mamba: log-space state transition matrix (critical for SSM dynamics)
+            "D",            # Mamba: skip connection strength (preserves gradient flow)
+            "dt_proj",      # Mamba: dt projection layer (controls time step dynamics)
+            "conv1d",       # Mamba: depthwise conv layer (local features, shouldn't be regularized)
+            "output_scale", # Custom: learnable output scaling parameter
+        ]
+
+        param_groups = [
+            {
+                "params": [p for n, p in self.model.named_parameters() if not any(nd in n for nd in no_decay)],
+                "weight_decay": args["wd"],
+            },
+            {
+                "params": [p for n, p in self.model.named_parameters() if any(nd in n for nd in no_decay)],
+                "weight_decay": 0.0,
+            },
+        ]
+
         self.opt = torch.optim.AdamW(
-            self.model.parameters(),
+            param_groups,
             lr=args["lr"],
-            weight_decay=args["wd"],
             betas=(0.9, 0.95),
         )
 
@@ -268,6 +290,8 @@ class Trainer:
             loop_kwargs["pred_len"] = flat_args.get("pred_len")
             loop_kwargs["d_out"] = self.task.infer_num_classes(flat_args)
 
+        if "grad_clip" in self.args:
+            loop_kwargs["grad_clip"] = self.args["grad_clip"]
 
         for ep in range(self.args["epochs"] + 1):
             # Training

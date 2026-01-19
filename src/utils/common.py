@@ -44,7 +44,6 @@ def amp_autocast(device_type: str = "cuda", enabled: bool = True):
     if not enabled:
         yield
     else:
-        # MPS doesn't support AMP, fall back to regular precision
         if device_type == "mps":
             yield
         else:

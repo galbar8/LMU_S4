@@ -63,6 +63,11 @@ def train_one_epoch(
                     logits = logits.view(xb.size(0), pred_len, d_out)
                 loss = lossfn(logits, yb)
 
+            if torch.isnan(loss) or torch.isinf(loss):
+                print(f"\nWarning: NaN/Inf loss detected (LR: {current_lr(optimizer):.2e})")
+                print(f"   Skipping batch. Try lowering learning rate if this persists.")
+                continue
+
             if amp and device.type == "cuda" and scaler is not None:
                 scaler.scale(loss).backward()
                 scaler.unscale_(optimizer)
@@ -90,6 +95,14 @@ def train_one_epoch(
                     sums[k] = sums.get(k, 0.0) + float(v) * bs
 
             n += bs
+
+    # Guard against division by zero (empty loader or all batches skipped)
+    if n == 0:
+        raise RuntimeError(
+            "No batches processed in training epoch! "
+            "This indicates either an empty data loader or all batches were skipped due to NaN/Inf losses. "
+            "Check your data pipeline and training stability (learning rate, initialization, etc.)."
+        )
 
     out = {"loss": tot_loss / n, "time_s": t.dt, "lr": current_lr(optimizer), "stepped": saw_opt_step}
     # finalize averages
@@ -145,6 +158,12 @@ def evaluate_one_epoch(
 
             n += bs
 
+
+    if n == 0:
+        raise RuntimeError(
+            "No batches processed in evaluation epoch! "
+            "This indicates an empty data loader. Check your data pipeline configuration."
+        )
 
     out = {"loss": tot_loss / n, "time_s": t.dt}
     for k, v in sums.items():
