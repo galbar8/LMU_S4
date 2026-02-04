@@ -106,11 +106,18 @@ def load_all_experiments(
                 run_name = f"{run_name}_{sub_task}"
 
             if frac < 1.0:
-                # Fractional dataset
                 frac_pct = int(frac * 100)
                 run_name = f"{run_name}_frac_{frac_pct}"
+                run_dir = base_path / run_name
+            else:
+                run_name_equal_params = f"{run_name}_equal_params"
+                run_dir_equal_params = base_path / run_name_equal_params
 
-            run_dir = base_path / run_name
+                if run_dir_equal_params.exists():
+                    run_dir = run_dir_equal_params
+                    run_name = run_name_equal_params
+                else:
+                    run_dir = base_path / run_name
 
             if run_dir.exists():
                 if print_logs:
@@ -195,7 +202,7 @@ def plot_metric_comparison_bar(
 
     Args:
         all_results: Results from load_all_experiments()
-        metric_key: Key for the metric to compare
+        metric_key: Key for the metric to figs
         title: Plot title
         ylabel: Y-axis label
     """
@@ -313,6 +320,7 @@ def plot_test_metric_comparison(
     metric_key: str = 'test_mae',
     title: str = 'Test MAE Comparison',
     ylabel: str = 'Test MAE (bpm)',
+    save_path: str = None,
 ):
     """
     Create bar chart comparing test metrics across models and fractions.
@@ -320,9 +328,10 @@ def plot_test_metric_comparison(
 
     Args:
         all_results: Results from load_all_experiments()
-        metric_key: Key for the test metric to compare
+        metric_key: Key for the test metric to figs
         title: Plot title
         ylabel: Y-axis label
+        save_path: Optional path to save the plot as PNG
     """
     models = list(all_results.keys())
     fractions = sorted(set(f for model_results in all_results.values()
@@ -392,13 +401,19 @@ def plot_test_metric_comparison(
     ax.grid(True, alpha=0.3, axis='y')
 
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+
     plt.show()
 
 
 def plot_test_data_efficiency(
     all_results: Dict[str, Dict[float, Dict[str, Any]]],
     metric_key: str = 'test_mae',
-    ylabel: str = 'Test MAE (bpm)'
+    ylabel: str = 'Test MAE (bpm)',
+    save_path: str = None,
 ):
     """
     Plot test metric vs data fraction to show data efficiency on test set.
@@ -408,6 +423,7 @@ def plot_test_data_efficiency(
         all_results: Results from load_all_experiments()
         metric_key: Test metric to plot
         ylabel: Y-axis label
+        save_path: Optional path to save the plot as PNG
     """
     models = list(all_results.keys())
     n_models = len(models)
@@ -462,6 +478,11 @@ def plot_test_data_efficiency(
     ax.set_xticks([10, 25, 50, 100])
 
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+
     plt.show()
 
 
@@ -589,7 +610,8 @@ def plot_performance_heatmap(
     cmap: str = 'RdYlGn',
     annot_format: str = '.4f',
     vmin: float = None,
-    vmax: float = None
+    vmax: float = None,
+    save_path: str = None,
 ):
     """
     Create a heatmap showing metric values across models and data fractions.
@@ -602,6 +624,7 @@ def plot_performance_heatmap(
         annot_format: Format string for annotations (e.g., '.4f', '.2f', '.2%')
         vmin: Minimum value for color scale
         vmax: Maximum value for color scale
+        save_path: Optional path to save the plot as PNG
     """
     models = sorted(all_results.keys())
     fractions = sorted(set(f for model_results in all_results.values()
@@ -652,5 +675,10 @@ def plot_performance_heatmap(
     ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
 
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+
     plt.show()
 

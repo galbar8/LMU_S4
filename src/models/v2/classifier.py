@@ -62,7 +62,6 @@ class SeqClassifier(nn.Module):
         self.head = nn.Linear(d_model, n_classes)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # x: (B,T) for discrete inputs or (B,T,D_in) for continuous
         if self.use_embedding:
             x = self.embedding(x)  # (B,T) -> (B,T,d_model)
         else:

@@ -12,6 +12,7 @@ def make_psmnist_loaders(
     root: str,
     batch_size: int = 64,
     num_workers: int = 0,
+    use_permutation: bool = True,
     permutation_seed: int = 42,
     normalize: str = "standard",
     subset_size: int = None,
@@ -26,6 +27,7 @@ def make_psmnist_loaders(
         root: Directory to download/store MNIST data
         batch_size: Batch size for dataloaders
         num_workers: Number of worker processes for data loading
+        use_permutation: Whether to apply permutation (False = SMNIST, True = PSMNIST)
         permutation_seed: Seed for generating fixed pixel permutation
         normalize: Normalization method ("standard", "minmax", "none")
         subset_size: Optional subset size for faster experimentation
@@ -41,6 +43,7 @@ def make_psmnist_loaders(
     # Create train config
     train_cfg = PSMNISTConfig(
         root=root,
+        use_permutation=use_permutation,
         permutation_seed=permutation_seed,
         normalize=normalize,
         split="train",
@@ -51,6 +54,7 @@ def make_psmnist_loaders(
     # Create test config (same permutation!)
     test_cfg = PSMNISTConfig(
         root=root,
+        use_permutation=use_permutation,
         permutation_seed=permutation_seed,
         normalize=normalize,
         split="test",
@@ -86,10 +90,10 @@ def make_psmnist_loaders(
         drop_last=False,
     )
 
-    print(f"PS-MNIST Loaders Created:")
+    print(f"{'PS-MNIST' if use_permutation else 'S-MNIST'} Loaders Created:")
     print(f"  Train: {len(train_dataset)} samples, {len(train_loader)} batches")
     print(f"  Test:  {len(test_dataset)} samples, {len(test_loader)} batches")
-    print(f"  Permutation seed: {permutation_seed}")
+    print(f"  Permutation: {'Enabled (seed=' + str(permutation_seed) + ')' if use_permutation else 'Disabled (Sequential MNIST)'}")
     print(f"  Sequence length: 784 (28×28)")
     print(f"  Classes: 10 (digits 0-9)")
 

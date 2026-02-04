@@ -122,6 +122,7 @@ def make_lmu_block_cfg_ctor(
     layerscale_init: float = 1e-2,
     residual_gain: float = 1.0,
     pool: str = "mean",
+    **kwargs,
 ) -> Callable[[int], BlockConfig]:
     """
     Convenience function to create LMU block config constructor.
@@ -163,6 +164,7 @@ def make_s4_block_cfg_ctor(
     layerscale_init: float = 1e-2,
     residual_gain: float = 1.0,
     pool: str = "mean",
+    **kwargs,
 ) -> Callable[[int], BlockConfig]:
     """
     Convenience function to create S4 block config constructor.

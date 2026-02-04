@@ -34,6 +34,7 @@ class PSMNISTTask(TaskProtocol):
         so we return test_loader twice (val and test are the same).
         """
         permutation_seed = kwargs.get("permutation_seed", 42)
+        use_permutation = kwargs.get("use_permutation", True)
         normalize = kwargs.get("normalize", "standard")
         subset_size = kwargs.get("subset_size", None)
         download = kwargs.get("download", True)
@@ -45,6 +46,7 @@ class PSMNISTTask(TaskProtocol):
             root=data_root,
             batch_size=batch_size,
             num_workers=num_workers,
+            use_permutation=use_permutation,
             permutation_seed=permutation_seed,
             normalize=normalize,
             subset_size=subset_size,
