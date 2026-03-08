@@ -216,6 +216,7 @@ def make_mamba_block_cfg_ctor(
     layerscale_init: float = 1e-2,
     residual_gain: float = 1.0,
     pool: str = "mean",
+    **kwargs,
 ) -> Callable[[int], BlockConfig]:
     """
     Convenience function to create Mamba block config constructor.

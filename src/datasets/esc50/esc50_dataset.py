@@ -288,13 +288,6 @@ def worker_init_fn(worker_id: int):
     s = base_seed + worker_id
     np.random.seed(s); pyrand.seed(s)
 
-def device_auto() -> torch.device:
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-        return torch.device("mps")
-    return torch.device("cpu")
-
 def make_esc50_loaders(
     data_root: str,
     batch_size: int = 32,

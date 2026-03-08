@@ -1717,7 +1717,7 @@ class FFTConv(nn.Module):
         k = self.drop_kernel(k)
 
         # In principle, we could pad to l_kernel+L-1 instead of l_kernel+L, but we choose the latter for
-        # equational simplicity. Additionally, we have not experimented to compare the efficiency of the two.
+        # equational simplicity. Additionally, we have not experimented to figs the efficiency of the two.
         k_f = torch.fft.rfft(k, n=l_kernel+L) # (C H L)
         x_f = torch.fft.rfft(x, n=l_kernel+L) # (B H L)
         y_f = contract('bhl,chl->bchl', x_f, k_f)
