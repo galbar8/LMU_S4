@@ -1,6 +1,6 @@
 """Unified visualization utilities for training history and results."""
 from __future__ import annotations
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import (
@@ -11,9 +11,7 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
     f1_score,
-    classification_report,
 )
-
 
 def plot_classification_history(history: Dict[str, List[float]], model_name: str = "Model"):
     """
@@ -25,7 +23,6 @@ def plot_classification_history(history: Dict[str, List[float]], model_name: str
     """
     fig, axes = plt.subplots(1, 2, figsize=(16, 6))
 
-    # Plot Accuracy
     if "train_acc" in history and "val_acc" in history:
         axes[0].plot(history["train_acc"], label="train_acc", linewidth=2.5)
         axes[0].plot(history["val_acc"], label="val_acc", linewidth=2.5)
@@ -35,7 +32,6 @@ def plot_classification_history(history: Dict[str, List[float]], model_name: str
         axes[0].set_title(f"{model_name} Model - Accuracy", fontsize=16)
         axes[0].grid(True, alpha=0.3)
 
-    # Plot Loss
     if "train_loss" in history and "val_loss" in history:
         axes[1].plot(history["train_loss"], label="train_loss", linewidth=2.5)
         axes[1].plot(history["val_loss"], label="val_loss", linewidth=2.5)
@@ -93,7 +89,6 @@ def plot_multilabel_history(history: Dict[str, List[float]], model_name: str = "
     """
     fig, axes = plt.subplots(1, 2, figsize=(12, 8))
 
-    # Plot Loss
     if "train_loss" in history and "val_loss" in history:
         axes[0].plot(history["train_loss"], label="train_loss", linewidth=2)
         axes[0].plot(history["val_loss"], label="val_loss", linewidth=2)
@@ -103,7 +98,6 @@ def plot_multilabel_history(history: Dict[str, List[float]], model_name: str = "
         axes[0].set_title(f"{model_name} - Training and Validation Loss", fontsize=14)
         axes[0].grid(True, alpha=0.3)
 
-    # Plot F1-Micro
     if "train_f1_micro" in history and "val_f1_micro" in history:
         axes[1].plot(history["train_f1_micro"], label="train_f1_micro", linewidth=2)
         axes[1].plot(history["val_f1_micro"], label="val_f1_micro", linewidth=2)
@@ -148,7 +142,6 @@ def plot_regression_predictions(
     ax.legend(fontsize=10)
     ax.grid(True, alpha=0.3)
 
-    # Error distribution
     ax = axes[1]
     errors = predictions - targets
     ax.hist(errors, bins=50, alpha=0.75, edgecolor='black')
@@ -162,39 +155,11 @@ def plot_regression_predictions(
     plt.tight_layout()
     plt.show()
 
-    # Print error statistics
     print(f"\nError Statistics:")
     print(f"  Mean Error: {errors.mean():.4f} {unit} (bias)")
     print(f"  Std Error:  {errors.std():.4f} {unit}")
     print(f"  95% of predictions within: ±{1.96 * errors.std():.2f} {unit}")
 
-
-def plot_training_history(
-    history: Dict[str, List[float]],
-    model_name: str = "Model",
-    task_type: str = "classification"
-):
-    """
-    Auto-detect and plot appropriate training history based on task type.
-
-    Args:
-        history: Training history dictionary
-        model_name: Name to display in plot titles
-        task_type: Type of task - "classification", "regression", or "multilabel"
-    """
-    if task_type == "classification":
-        plot_classification_history(history, model_name)
-    elif task_type == "regression":
-        plot_regression_history(history, model_name)
-    elif task_type == "multilabel":
-        plot_multilabel_history(history, model_name)
-    else:
-        raise ValueError(f"Unknown task_type: {task_type}")
-
-
-# ==============================================================================
-# Binary Classification Visualizations
-# ==============================================================================
 
 def plot_roc_curve(
     labels: np.ndarray,

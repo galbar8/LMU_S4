@@ -83,7 +83,6 @@ class ListOpsTask(TaskProtocol):
         This is needed for the embedding layer.
         """
 
-        # Create a temporary config to get vocab size
         max_length = kwargs.get("max_length", 2000)
         vocab_path = kwargs.get("vocab_path", None)
 

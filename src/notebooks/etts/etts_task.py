@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import Tuple, Dict, Any
 
-import numpy as np
 from torch.utils.data import DataLoader
 
 from src.datasets.etts.etts_dataloader import make_etts_loaders

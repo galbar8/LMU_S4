@@ -44,7 +44,6 @@ class CIFAR10Task(TaskProtocol):
         persistent_workers = kwargs.get("persistent_workers", False)
         num_workers = kwargs.get("num_workers", 0)
 
-        # Optional permutation support (mirrors PS-MNIST "fixed permutation" concept)
         permute = kwargs.get("permute", False)
         permutation_seed = kwargs.get("permutation_seed", 42)
 

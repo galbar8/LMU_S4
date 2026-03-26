@@ -41,14 +41,13 @@ def train_one_epoch(
     """
     model.train()
     tot_loss = 0.0
-    sums: Dict[str, float] = {}  # accumulate metric * batch_size
+    sums: Dict[str, float] = {}
     n = 0
     saw_opt_step = False
 
     pred_len = kwargs.get("pred_len")
     d_out = kwargs.get("d_out")
 
-    # Get device type string for amp_autocast
     device_type = device.type if hasattr(device, 'type') else str(device)
 
     with Timer() as t:
@@ -96,7 +95,6 @@ def train_one_epoch(
 
             n += bs
 
-    # Guard against division by zero (empty loader or all batches skipped)
     if n == 0:
         raise RuntimeError(
             "No batches processed in training epoch! "
@@ -133,7 +131,6 @@ def evaluate_one_epoch(
     pred_len = kwargs.get("pred_len")
     d_out = kwargs.get("d_out")
 
-    # Get device type string for amp_autocast
     device_type = device.type if hasattr(device, 'type') else str(device)
 
     with Timer() as t:

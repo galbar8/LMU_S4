@@ -128,9 +128,9 @@ def apply_fraction_to_loaders(
     print(f"   Original train size: {len(train_loader.dataset)}")
     print(f"   Original val size: {len(val_loader.dataset)}")
 
-    # Reduce train and val loaders
+    # Reduce train loaders
     reduced_train = reduce_loader_size(train_loader, fraction, seed=seed, stratified=True)
-    reduced_val = val_loader #reduce_loader_size(val_loader, fraction, seed=seed + 1, stratified=True)
+    reduced_val = val_loader
 
     print(f"   Reduced train size: {len(reduced_train.dataset)}")
     print(f"   Reduced val size: {len(reduced_val.dataset)}")

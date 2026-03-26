@@ -60,6 +60,6 @@ def plot_forecasting_comparison(model, preds, targets, pred_len, dataset_name, f
         filename = f"forecasting_{dataset_name.lower()}{frac_suffix}_comparison.png"
         save_file = Path(save_path) / filename
         plt.savefig(save_file, dpi=300, bbox_inches='tight')
-        print(f"✓ Figure saved to: {save_file}")
+        print(f"Figure saved to: {save_file}")
 
     plt.show()

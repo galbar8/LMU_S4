@@ -69,7 +69,6 @@ class Trainer:
         flat_args: Dict[str, Any] = dict(self.args)
         flat_args.update(self.args.get("data_loader_kwargs", {}))
 
-        # Model construction
         d_in = self.task.infer_input_dim(flat_args)
         theta = self.task.infer_theta(flat_args)
         n_classes = self.task.infer_num_classes(flat_args)
@@ -153,7 +152,6 @@ class Trainer:
         else:
             self.scaler = None
 
-        # Logging (stubbed out; replace with your own logger if needed)
         self.tb = None
 
         # Loss function and metrics based on task type
@@ -413,7 +411,6 @@ class Trainer:
 
         pos_weight = neg / (pos + 1e-8)
 
-        # Log class distribution
         print(f"  Total training samples: {n_samples}")
         print(f"  Positive samples per class: {pos.numpy()}")
         print(f"  Negative samples per class: {neg.numpy()}")

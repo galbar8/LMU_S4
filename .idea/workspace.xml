@@ -6,31 +6,48 @@
   <component name="ChangeListManager">
     <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
       <change afterPath="$PROJECT_DIR$/src/notebooks/cifar10/runs/cifar10_s4_task_equal_params/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/notebooks/cifar10/training/train_cifar10.py" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/notebooks/psmnist/runs/psmnist_s4_task_equal_params/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/datasets/esc50/esc50_dataset.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/s4/s4_block.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/s4/s4_block.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_lmu.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_mamba.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_task.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/listops/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/compare.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/listops/listops_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_lmu.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/listops_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_mamba.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/listops_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/listops_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/training/job_listops_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/training/train_listops_mamba.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_lmu.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_mamba.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/ppg_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/ppg_s4.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/training/job_ppg_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/training/train_ppg_mamba.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_lmu.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_mamba.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/training/job_psmnist_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/runs/ptbxl_lmu_task/test_results.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/runs/ptbxl_lmu_task/test_results.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/research.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/research.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/block_factory.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/block_factory.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_mamba.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/training/job_qqp_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/training/train_qqp_mamba.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/smnist/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/smnist/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/loops.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/loops.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/subset_loaders.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/subset_loaders.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/visualization.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,7 +231,9 @@
       <workItem from="1768466900133" duration="360000" />
       <workItem from="1768582776023" duration="2423000" />
       <workItem from="1768848917275" duration="80132000" />
-      <workItem from="1769986765363" duration="53303000" />
+      <workItem from="1769986765363" duration="59096000" />
+      <workItem from="1773055541814" duration="2412000" />
+      <workItem from="1773608790882" duration="2296000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -376,7 +395,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770209240640</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1772950710532</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1772950710532</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
