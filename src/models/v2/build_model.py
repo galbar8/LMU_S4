@@ -2,15 +2,18 @@ from dataclasses import dataclass
 from src.models.v2.classifier import SeqClassifier
 from src.models.v2.base import ResidualSeqBlock
 from src.models.v2.lmu_block import LMUCoreAdapter
+from src.models.v2.mamba_block import MambaCoreAdapter
 from src.models.v2.s4_block import S4CoreAdapter
 
 
 @dataclass
 class BlockConfig:
-    kind: str  # "lmu" or "s4"
+    kind: str  # "lmu" or "s4" or "mamba"
+
     # LMU params
     memory_size: int = 256
     theta: int = 500
+
     # S4 params
     d_state: int = 64
     channels: int = 1
@@ -18,6 +21,15 @@ class BlockConfig:
     mode: str = 's4d'  # 's4d', 's4', 'diag'
     dt_min: float = 0.001
     dt_max: float = 0.1
+
+    # Mamba (minimal)
+    mamba_d_state: int = 16
+    mamba_expand_factor: int = 2
+    mamba_d_conv: int = 4
+    mamba_dt_min: float = 0.001
+    mamba_dt_max: float = 0.1
+    use_external_mlp: bool = True
+
     # Common params (used inside blocks/classifier)
     dropout: float = 0.2
     mlp_ratio: float = 2.0
@@ -47,6 +59,15 @@ def make_block_factory(cfg: BlockConfig):
                 dt_min=cfg.dt_min,
                 dt_max=cfg.dt_max,
             )
+        elif cfg.kind.lower() == "mamba":
+            core = MambaCoreAdapter(
+                d_model=d_model,
+                d_state=cfg.mamba_d_state,
+                expand_factor=cfg.mamba_expand_factor,
+                d_conv=cfg.mamba_d_conv,
+                dt_min=cfg.mamba_dt_min,
+                dt_max=cfg.mamba_dt_max,
+            )
         else:
             raise ValueError(f"Unknown block kind: {cfg.kind}")
 
@@ -58,6 +79,7 @@ def make_block_factory(cfg: BlockConfig):
             droppath=droppath,
             layerscale_init=cfg.layerscale_init,
             residual_gain=cfg.residual_gain,
+            use_mlp_branch=cfg.use_external_mlp,
         )
 
     return factory
@@ -69,6 +91,7 @@ def build_model(
         d_model: int = 256,
         depth: int = 4,
         block_cfg: BlockConfig = BlockConfig(kind="lmu"),
+        vocab_size: int = None,
 ):
     block_factory = make_block_factory(block_cfg)
     return SeqClassifier(
@@ -79,4 +102,5 @@ def build_model(
         block_factory=block_factory,
         droppath_final=block_cfg.droppath_final,
         pool=block_cfg.pool,
+        vocab_size=vocab_size,
     )

@@ -43,9 +43,11 @@ class PSMNISTDataset(Dataset):
             transform=None  # We'll apply transforms manually
         )
 
-        # Generate fixed permutation using seed
-        rng = np.random.RandomState(cfg.permutation_seed)
-        self.permutation = rng.permutation(784)  # Fixed permutation for all samples
+        if cfg.use_permutation:
+            rng = np.random.RandomState(cfg.permutation_seed)
+            self.permutation = rng.permutation(784)
+        else:
+            self.permutation = np.arange(784)
 
         # Normalization parameters (MNIST statistics)
         if cfg.normalize == "standard":

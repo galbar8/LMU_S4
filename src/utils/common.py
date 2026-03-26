@@ -1,5 +1,5 @@
-# src/utils/common.py
-from typing import Dict
+import os
+from typing import Dict, Any
 
 import torch, random, numpy as np
 from contextlib import contextmanager
@@ -26,21 +26,40 @@ def count_params(model, trainable_only: bool = True) -> int:
         return sum(p.numel() for p in model.parameters())
 
 
-def device_auto():
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    elif torch.backends.mps.is_available(): # for Apple Silicon
-        torch.set_float32_matmul_precision("high")
-        return torch.device("mps")
+def device_auto(args: Dict[str, Any]):
+    if torch.backends.mps.is_available():
+        args["device"] = torch.device("mps")
+        print("Using MPS")
+    elif torch.cuda.is_available():
+        args["device"] = torch.device("cuda")
     else:
-        return torch.device("cpu")
+        args["device"] = torch.device("cpu")
+        args["amp"] = False
+
+    if torch.backends.mps.is_available():
+        torch.mps.set_per_process_memory_fraction(0.9)
+        os.environ["PYTORCH_MPS_HIGH_WATERMARK_RATIO"] = "0.0"
+
+    return args
+
 
 @contextmanager
-def amp_autocast(enabled: bool):
-    if not enabled: yield
+def amp_autocast(device_type: str = "cuda", enabled: bool = True):
+    """
+    Automatic mixed precision context manager.
+
+    Args:
+        device_type: Device type ('cuda', 'cpu', or 'mps')
+        enabled: Whether to enable AMP
+    """
+    if not enabled:
+        yield
     else:
-        with torch.autocast(device_type="cuda" if torch.cuda.is_available() else "cpu", dtype=torch.float16):
+        if device_type == "mps":
             yield
+        else:
+            with torch.autocast(device_type=device_type, dtype=torch.float16):
+                yield
 
 
 def print_model_details(model, trainer=None):

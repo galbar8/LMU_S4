@@ -19,7 +19,8 @@ class PSMNISTConfig:
     root: str  # folder to download/store MNIST data
 
     # Permutation
-    permutation_seed: int = 42  # seed for generating fixed permutation
+    use_permutation: bool = True  # whether to apply permutation (False = SMNIST, True = PSMNIST)
+    permutation_seed: int = 42  # seed for generating fixed permutation (only used if use_permutation=True)
 
     # Preprocessing
     normalize: Literal["standard", "minmax", "none"] = "standard"

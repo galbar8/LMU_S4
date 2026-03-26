@@ -1,111 +1,65 @@
-from __future__ import annotations
-from typing import Tuple, Dict, Any, Callable
-
-import torch
+import matplotlib.pyplot as plt
 import numpy as np
-from torch.utils.data import DataLoader
-from tqdm.auto import tqdm
-from torch.amp import autocast as amp_autocast
-
-from src.datasets.etts.etts_dataloader import make_etts_loaders
-from src.models.v2.build_model import BlockConfig, build_model
-from src.types.task_protocol import TaskProtocol
+from pathlib import Path
 
 
-class ETTSTask(TaskProtocol):
-    """ETTS forecasting task (regression)."""
-    problem_type: str = "regression"
+def plot_forecasting_comparison(model, preds, targets, pred_len, dataset_name, fraction=1.0, num_samples=5, save_path=None):
+    if hasattr(preds, 'cpu'):
+        preds = preds.cpu().numpy()
+    if hasattr(targets, 'cpu'):
+        targets = targets.cpu().numpy()
 
-    def make_loaders(
-        self,
-        data_root: str,
-        batch_size: int = 64,
-        num_workers: int = 4,
-        **kwargs
-    ) -> Tuple[DataLoader, DataLoader, DataLoader]:
-        """Create data loaders for the ETTS dataset."""
-        return make_etts_loaders(
-            data_root=data_root,
-            which=kwargs.get("which", "ETTh1"),
-            batch_size=batch_size,
-            num_workers=num_workers,
-            seq_len=kwargs.get("seq_len", 96),
-            pred_len=kwargs.get("pred_len", 24),
-            feature_mode=kwargs.get("feature_mode", "target"),
-            target_col=kwargs.get("target_col", "OT"),
-            split_ratio=kwargs.get("split_ratio", (0.7, 0.1, 0.2)),
-            normalize=kwargs.get("normalize", "zscore"),
-            pin_memory=kwargs.get("pin_memory", True),
-            persistent_workers=kwargs.get("persistent_workers", False),
-        )
+    num_windows = preds.shape[0]
 
-    def infer_input_dim(self, args: Dict[str, Any]) -> int:
-        """Infer input dimension based on feature mode."""
-        fm = args.get("feature_mode", "target")
-        return 1 if fm == "target_only" else 7
+    # Randomly select samples to plot
+    np.random.seed(42)
+    sample_indices = np.random.choice(num_windows, min(num_samples, num_windows), replace=False)
 
-    def infer_num_classes(self, args: Dict[str, Any]) -> int:
-        """Infer number of classes based on feature mode."""
-        return 7 if args.get("feature_mode", "target") == "multivariate" else 1
+    # Create figure
+    fig, axes = plt.subplots(num_samples, 1, figsize=(14, 3 * num_samples))
+    if num_samples == 1:
+        axes = [axes]
 
-    def infer_theta(self, args: Dict[str, Any]) -> int:
-        """Infer sequence length."""
-        return args.get("seq_len", 96)
+    for idx, sample_idx in enumerate(sample_indices):
+        ax = axes[idx]
 
+        # Extract predictions and targets for this sample
+        pred_signal = preds[sample_idx, :, 0]  # First feature (target variable)
+        target_signal = targets[sample_idx, :, 0]
 
-def make_block_cfg_ctor(
-    kind: str,
-    *,
-    # Common
-    dropout: float,
-    mlp_ratio: float,
-    droppath_final: float,
-    layerscale_init: float,
-    residual_gain: float,
-    pool: str,
-    # LMU-specific
-    memory_size: int = 256,
-    # S4-specific
-    d_state: int = 64,
-    channels: int = 1,
-    bidirectional: bool = False,
-    mode: str = "s4d",
-    dt_min: float = 0.001,
-    dt_max: float = 0.1,
-):
-    """
-    Create a block config constructor. Pass kind="lmu" or "s4".
-    This allows for easy comparison between LMU and S4 models by changing a single argument.
-    """
-    def block_cfg_ctor(theta: int) -> BlockConfig:
-        if kind.lower() == "lmu":
-            return BlockConfig(
-                kind="lmu",
-                memory_size=memory_size,
-                theta=theta,
-                dropout=dropout,
-                mlp_ratio=mlp_ratio,
-                droppath_final=droppath_final,
-                layerscale_init=layerscale_init,
-                residual_gain=residual_gain,
-                pool=pool,
-            )
-        elif kind.lower() == "s4":
-            return BlockConfig(
-                kind="s4",
-                d_state=d_state,
-                channels=channels,
-                bidirectional=bidirectional,
-                mode=mode,
-                dt_min=dt_min,
-                dt_max=dt_max,
-                dropout=dropout,
-                mlp_ratio=mlp_ratio,
-                droppath_final=droppath_final,
-                layerscale_init=layerscale_init,
-                residual_gain=residual_gain,
-                pool=pool,
-            )
-        else:
-            raise ValueError(f"Unknown block kind: {kind}")
-    return block_cfg_ctor
+        # Time steps
+        time_steps = np.arange(pred_len)
+
+        # Plot both signals
+        ax.plot(time_steps, target_signal, 'b-', linewidth=2, label='Ground Truth', alpha=0.8)
+        ax.plot(time_steps, pred_signal, 'r--', linewidth=2, label='Prediction', alpha=0.8)
+
+        # Calculate error metrics for this sample
+        mae = np.mean(np.abs(pred_signal - target_signal))
+        mse = np.mean((pred_signal - target_signal) ** 2)
+        rmse = np.sqrt(mse)
+
+        # Styling
+        ax.set_xlabel('Time Steps', fontsize=11, fontweight='bold')
+        ax.set_ylabel('Value', fontsize=11, fontweight='bold')
+        ax.set_title(f'Sample {sample_idx} | MAE: {mae:.4f}, RMSE: {rmse:.4f}',
+                     fontsize=12, fontweight='bold')
+        ax.legend(loc='best', fontsize=10)
+        ax.grid(True, alpha=0.3)
+
+    # Overall title
+    frac_str = f"{int(fraction * 100)}%" if fraction < 1.0 else "100%"
+    fig.suptitle(f'{dataset_name.upper()} - {model} Forecasting Results ({frac_str} Data)\n'
+                 f'Predicted vs Ground Truth (Horizon: {pred_len} steps)',
+                 fontsize=14, fontweight='bold', y=1.0)
+
+    plt.tight_layout()
+
+    if save_path is not None:
+        frac_suffix = f"_frac{int(fraction * 100)}" if fraction < 1.0 else ""
+        filename = f"forecasting_{dataset_name.lower()}{frac_suffix}_comparison.png"
+        save_file = Path(save_path) / filename
+        plt.savefig(save_file, dpi=300, bbox_inches='tight')
+        print(f"Figure saved to: {save_file}")
+
+    plt.show()

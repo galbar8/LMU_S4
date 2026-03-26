@@ -4,7 +4,7 @@ from typing import Dict, Any, Callable, Optional
 from tqdm import tqdm
 
 from src.utils.common import amp_autocast
-from src.utils.metrics import top1
+from src.eval.metrics import top1
 from src.utils.logging import Timer
 
 CLIP_NORM = 1.0
@@ -29,7 +29,6 @@ def train_one_epoch(
     device: torch.device,
     amp: bool,
     lossfn: nn.Module,
-    ema = None,
     *,
     metrics_fn: Optional[Callable[[torch.Tensor, torch.Tensor], Dict[str, float]]] = None,
     grad_clip: float = CLIP_NORM,
@@ -42,12 +41,14 @@ def train_one_epoch(
     """
     model.train()
     tot_loss = 0.0
-    sums: Dict[str, float] = {}  # accumulate metric * batch_size
+    sums: Dict[str, float] = {}
     n = 0
     saw_opt_step = False
 
     pred_len = kwargs.get("pred_len")
     d_out = kwargs.get("d_out")
+
+    device_type = device.type if hasattr(device, 'type') else str(device)
 
     with Timer() as t:
         for batch in tqdm(loader, desc="train", leave=False):
@@ -55,11 +56,16 @@ def train_one_epoch(
             xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
 
             optimizer.zero_grad(set_to_none=True)
-            with amp_autocast(amp):
+            with amp_autocast(device_type, amp):
                 logits = model(xb)
                 if pred_len is not None and d_out is not None:
                     logits = logits.view(xb.size(0), pred_len, d_out)
                 loss = lossfn(logits, yb)
+
+            if torch.isnan(loss) or torch.isinf(loss):
+                print(f"\nWarning: NaN/Inf loss detected (LR: {current_lr(optimizer):.2e})")
+                print(f"   Skipping batch. Try lowering learning rate if this persists.")
+                continue
 
             if amp and device.type == "cuda" and scaler is not None:
                 scaler.scale(loss).backward()
@@ -88,8 +94,13 @@ def train_one_epoch(
                     sums[k] = sums.get(k, 0.0) + float(v) * bs
 
             n += bs
-            if ema is not None:
-                ema.update(model)
+
+    if n == 0:
+        raise RuntimeError(
+            "No batches processed in training epoch! "
+            "This indicates either an empty data loader or all batches were skipped due to NaN/Inf losses. "
+            "Check your data pipeline and training stability (learning rate, initialization, etc.)."
+        )
 
     out = {"loss": tot_loss / n, "time_s": t.dt, "lr": current_lr(optimizer), "stepped": saw_opt_step}
     # finalize averages
@@ -104,7 +115,6 @@ def evaluate_one_epoch(
     device: torch.device,
     amp: bool,
     loss_fn: nn.Module,
-    ema = None,
     *,
     metrics_fn: Optional[Callable[[torch.Tensor, torch.Tensor], Dict[str, float]]] = None,
     **kwargs,
@@ -112,8 +122,6 @@ def evaluate_one_epoch(
     """
     See train_one_epoch for metrics_fn contract.
     """
-    if ema is not None:
-        ema.apply(model)
 
     model.eval()
     tot_loss = 0.0
@@ -123,11 +131,13 @@ def evaluate_one_epoch(
     pred_len = kwargs.get("pred_len")
     d_out = kwargs.get("d_out")
 
+    device_type = device.type if hasattr(device, 'type') else str(device)
+
     with Timer() as t:
         for batch in tqdm(loader, desc="val", leave=False):
             xb, yb, _ = _unpack_batch(batch)
             xb, yb = xb.to(device, non_blocking=True), yb.to(device, non_blocking=True)
-            with amp_autocast(amp):
+            with amp_autocast(device_type, amp):
                 logits = model(xb)
                 if pred_len is not None and d_out is not None:
                     logits = logits.view(xb.size(0), pred_len, d_out)
@@ -145,8 +155,12 @@ def evaluate_one_epoch(
 
             n += bs
 
-    if ema is not None:
-        ema.restore(model)
+
+    if n == 0:
+        raise RuntimeError(
+            "No batches processed in evaluation epoch! "
+            "This indicates an empty data loader. Check your data pipeline configuration."
+        )
 
     out = {"loss": tot_loss / n, "time_s": t.dt}
     for k, v in sums.items():

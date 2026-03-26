@@ -1,0 +1,17 @@
+{
+  "accuracy": 0.17800000309944153,
+  "loss": 2.259765625,
+  "per_class_accuracy": {
+    "class_00": 1.0,
+    "class_01": 0.0,
+    "class_02": 0.0,
+    "class_03": 0.0,
+    "class_04": 0.0,
+    "class_05": 0.0,
+    "class_06": 0.0,
+    "class_07": 0.0,
+    "class_08": 0.0,
+    "class_09": 0.0
+  },
+  "num_samples": 2000
+}

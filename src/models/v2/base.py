@@ -76,6 +76,7 @@ class ResidualSeqBlock(nn.Module):
         droppath: float = 0.1,
         layerscale_init: float = 1e-2,
         residual_gain: float = 1.0,
+        use_mlp_branch: bool = True
     ):
         super().__init__()
         self.core = core
@@ -90,6 +91,7 @@ class ResidualSeqBlock(nn.Module):
         self.dp2 = DropPath(droppath)
         self.ls2 = LayerScale(d_model, layerscale_init)
 
+        self.use_mlp_branch = use_mlp_branch
         self.residual_gain = residual_gain
 
     def forward(
@@ -106,5 +108,6 @@ class ResidualSeqBlock(nn.Module):
         x = x + self.residual_gain * self.dp1(self.ls1(self.drop1(y)))
 
         # MLP branch
-        x = x + self.residual_gain * self.dp2(self.ls2(self.drop2(self.mlp(self.norm2(x)))))
+        if self.use_mlp_branch:
+            x = x + self.residual_gain * self.dp2(self.ls2(self.drop2(self.mlp(self.norm2(x)))))
         return x

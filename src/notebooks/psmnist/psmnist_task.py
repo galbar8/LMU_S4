@@ -32,28 +32,21 @@ class PSMNISTTask(TaskProtocol):
 
         Note: PS-MNIST traditionally doesn't have a separate validation set,
         so we return test_loader twice (val and test are the same).
-
-        For proper validation during training, you could split train set
-        or use test set for both validation and final evaluation.
         """
         permutation_seed = kwargs.get("permutation_seed", 42)
+        use_permutation = kwargs.get("use_permutation", True)
         normalize = kwargs.get("normalize", "standard")
         subset_size = kwargs.get("subset_size", None)
-        fraction = kwargs.get("fraction", 1.0)
         download = kwargs.get("download", True)
         pin_memory = kwargs.get("pin_memory", False)
         persistent_workers = kwargs.get("persistent_workers", False)
         num_workers = kwargs.get("num_workers", 0)
 
-        # Convert fraction to subset_size if specified
-        if fraction < 1.0 and subset_size is None:
-            # MNIST train has 60000 samples
-            subset_size = int(60000 * fraction)
-
         train_loader, test_loader = make_psmnist_loaders(
             root=data_root,
             batch_size=batch_size,
             num_workers=num_workers,
+            use_permutation=use_permutation,
             permutation_seed=permutation_seed,
             normalize=normalize,
             subset_size=subset_size,

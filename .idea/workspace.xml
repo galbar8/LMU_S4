@@ -5,12 +5,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19313606-7e8c-43a3-a9bb-ffced5c7dacc" name="Changes" comment="WIP">
+      <change afterPath="$PROJECT_DIR$/src/notebooks/cifar10/runs/cifar10_s4_task_equal_params/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/notebooks/psmnist/runs/psmnist_s4_task_equal_params/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/eval/compare.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/eval/compare.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_mamba.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/cifar10_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/cifar10/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/cifar10/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/esc50/esc50_s4.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/etts/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_config.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_lmu.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_s4.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/etts_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/etts_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/etts/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/etts/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/listops_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/listops_task.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/listops/listops_task.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/training/job_listops_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/listops/training/train_listops_mamba.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ppg/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/training/job_ppg_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ppg/training/train_ppg_mamba.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_mamba.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/psmnist/psmnist_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/psmnist/training/job_psmnist_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/ptbxl_s4.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/ptbxl/runs/ptbxl_lmu_task/test_results.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/ptbxl/runs/ptbxl_lmu_task/test_results.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_lmu.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/qqp_mamba.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/qqp/qqp_mamba.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/training/job_qqp_mamba.sh" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/qqp/training/train_qqp_mamba.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/notebooks/smnist/compare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/notebooks/smnist/compare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/loops.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/loops.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_utils/trainer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_utils/trainer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/subset_loaders.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/subset_loaders.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/visualization.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/visualization.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,11 +101,12 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;I do mind&quot;,
     &quot;ToolWindow.GitHub Copilot Chat.ShowToolbar&quot;: &quot;false&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;refactor&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/datasets/ppg/data&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/glbrlb/PycharmProjects/Msc/LMU_S4/src/notebooks/smnist/runs&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -81,16 +119,18 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/datasets/ppg/data" />
-      <recent name="$PROJECT_DIR$/src/datasets/etts/data" />
-      <recent name="$PROJECT_DIR$/src/notebooks/ptbxl/saves" />
-      <recent name="$PROJECT_DIR$/src/datasets/ptbxl" />
+      <recent name="$PROJECT_DIR$/src/notebooks/smnist/runs" />
+      <recent name="$PROJECT_DIR$/src/notebooks/cifar10/runs/cifar10_s4_task_equal_params" />
+      <recent name="$PROJECT_DIR$/src/notebooks/qqp/runs" />
+      <recent name="$PROJECT_DIR$/src/datasets/LRA/pathfinder/data" />
+      <recent name="$PROJECT_DIR$/src/notebooks/psmnist/runs" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/models/s4" />
-      <recent name="$PROJECT_DIR$/src/datasets/ptbxl/data" />
-      <recent name="$PROJECT_DIR$/src/datasets/esc50" />
-      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$/src/notebooks/ppg" />
+      <recent name="$PROJECT_DIR$/src/notebooks/ppg/figs/lmu_s4_mamba" />
+      <recent name="$PROJECT_DIR$/src/notebooks/ppg/figs/lmu_s4" />
+      <recent name="$PROJECT_DIR$/src/notebooks/cifar10/figs/lmu_s4_mamba" />
+      <recent name="$PROJECT_DIR$/src/notebooks/cifar10/figs/lmu_s4" />
     </key>
   </component>
   <component name="RunManager" selected="Python tests.Python tests in /Users/glbrlb/PycharmProjects/Msc/LMU_S4/test_bidirectional.py">
@@ -143,8 +183,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
-        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-PY-252.28539.27" />
+        <option value="bundled-python-sdk-07523f343e4f-968fe969f28a-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.28539.27" />
       </set>
     </attachedChunks>
   </component>
@@ -177,7 +217,23 @@
       <workItem from="1763036916489" duration="81666000" />
       <workItem from="1764263184089" duration="2422000" />
       <workItem from="1764273299052" duration="79827000" />
-      <workItem from="1765568070430" duration="33088000" />
+      <workItem from="1765568070430" duration="39095000" />
+      <workItem from="1766077985504" duration="95000" />
+      <workItem from="1766078110448" duration="24318000" />
+      <workItem from="1766182715808" duration="62100000" />
+      <workItem from="1766698592805" duration="1454000" />
+      <workItem from="1766700129265" duration="43224000" />
+      <workItem from="1767211742724" duration="4765000" />
+      <workItem from="1767246699502" duration="9360000" />
+      <workItem from="1767271810123" duration="45902000" />
+      <workItem from="1767453021876" duration="69413000" />
+      <workItem from="1768466292233" duration="603000" />
+      <workItem from="1768466900133" duration="360000" />
+      <workItem from="1768582776023" duration="2423000" />
+      <workItem from="1768848917275" duration="80132000" />
+      <workItem from="1769986765363" duration="59096000" />
+      <workItem from="1773055541814" duration="2412000" />
+      <workItem from="1773608790882" duration="2296000" />
     </task>
     <task id="LOCAL-00001" summary="WIP">
       <option name="closed" value="true" />
@@ -227,7 +283,127 @@
       <option name="project" value="LOCAL" />
       <updated>1765665758060</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1765919352963</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1765919352963</updated>
+    </task>
+    <task id="LOCAL-00008" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766184389431</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1766184389431</updated>
+    </task>
+    <task id="LOCAL-00009" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766184493871</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1766184493871</updated>
+    </task>
+    <task id="LOCAL-00010" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766229700776</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1766229700776</updated>
+    </task>
+    <task id="LOCAL-00011" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766438058426</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1766438058426</updated>
+    </task>
+    <task id="LOCAL-00012" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766438085726</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1766438085726</updated>
+    </task>
+    <task id="LOCAL-00013" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1766784287230</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1766784287230</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Add binary metrics">
+      <option name="closed" value="true" />
+      <created>1766831200832</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1766831200832</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Add final compare">
+      <option name="closed" value="true" />
+      <created>1766869403660</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1766869403660</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Add cifar 10 dataset">
+      <option name="closed" value="true" />
+      <created>1767351347186</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1767351347186</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Add mamba">
+      <option name="closed" value="true" />
+      <created>1767351385997</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1767351385997</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Add mamba">
+      <option name="closed" value="true" />
+      <created>1767437956404</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1767437956404</updated>
+    </task>
+    <task id="LOCAL-00019" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1768856518935</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1768856518935</updated>
+    </task>
+    <task id="LOCAL-00020" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1770209240640</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1770209240640</updated>
+    </task>
+    <task id="LOCAL-00021" summary="WIP">
+      <option name="closed" value="true" />
+      <created>1772950710532</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1772950710532</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -245,6 +421,10 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add binary metrics" />
+    <MESSAGE value="Add final compare" />
+    <MESSAGE value="Add cifar 10 dataset" />
+    <MESSAGE value="Add mamba" />
     <MESSAGE value="WIP" />
     <option name="LAST_COMMIT_MESSAGE" value="WIP" />
   </component>

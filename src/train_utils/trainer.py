@@ -22,7 +22,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from src.models.v2.build_model import build_model
 from src.train_utils.loops import train_one_epoch, evaluate_one_epoch
 from src.types.task_protocol import TaskProtocol
-from src.utils.metrics import multilabel_metrics_fn
+from src.eval.metrics import multilabel_metrics_fn
 from src.utils.subset_loaders import apply_fraction_to_loaders
 
 
@@ -69,7 +69,6 @@ class Trainer:
         flat_args: Dict[str, Any] = dict(self.args)
         flat_args.update(self.args.get("data_loader_kwargs", {}))
 
-        # Model construction
         d_in = self.task.infer_input_dim(flat_args)
         theta = self.task.infer_theta(flat_args)
         n_classes = self.task.infer_num_classes(flat_args)
@@ -80,19 +79,55 @@ class Trainer:
             n_classes = n_classes * pred_len
 
         block_cfg = args["block_cfg_ctor"](theta)
+
+        # Check if task provides vocab_size (for embedding-based inputs like ListOps)
+        vocab_size = None
+        if hasattr(self.task, 'get_vocab_size'):
+            try:
+                vocab_size = self.task.get_vocab_size(
+                    data_root=args["data_root"],
+                    **args.get("data_loader_kwargs", {})
+                )
+                print(f"Using embedding layer with vocab_size={vocab_size}")
+            except Exception as e:
+                print(f"Warning: Could not get vocab_size: {e}")
+
         self.model: nn.Module = self.model_builder(
             d_in=d_in,
             n_classes=n_classes,
             d_model=args["d_model"],
             depth=args["depth"],
             block_cfg=block_cfg,
+            vocab_size=vocab_size,
         ).to(self.device)
 
         # Optimiser and scheduler
+        # Exclude SSM/dt-specific parameters from weight decay to prevent unstable dynamics
+        # Based on Mamba best practices and ODE/SSM literature
+        no_decay = [
+            "bias",         # Standard: biases don't need regularization
+            "norm",         # Standard: normalization layer parameters
+            "A_log",        # Mamba: log-space state transition matrix (critical for SSM dynamics)
+            "D",            # Mamba: skip connection strength (preserves gradient flow)
+            "dt_proj",      # Mamba: dt projection layer (controls time step dynamics)
+            "conv1d",       # Mamba: depthwise conv layer (local features, shouldn't be regularized)
+            "output_scale", # Custom: learnable output scaling parameter
+        ]
+
+        param_groups = [
+            {
+                "params": [p for n, p in self.model.named_parameters() if not any(nd in n for nd in no_decay)],
+                "weight_decay": args["wd"],
+            },
+            {
+                "params": [p for n, p in self.model.named_parameters() if any(nd in n for nd in no_decay)],
+                "weight_decay": 0.0,
+            },
+        ]
+
         self.opt = torch.optim.AdamW(
-            self.model.parameters(),
+            param_groups,
             lr=args["lr"],
-            weight_decay=args["wd"],
             betas=(0.9, 0.95),
         )
 
@@ -109,18 +144,14 @@ class Trainer:
         else:
             self.sch = CosineAnnealingLR(self.opt, T_max=args["epochs"])
 
-        # AMP scaler
         if self.amp and self.device.type == "cuda":
             try:
                 self.scaler: Optional[torch.cuda.amp.GradScaler] = torch.amp.GradScaler(device="cuda", enabled=True)
-            except AttributeError:  # older PyTorch
+            except AttributeError:
                 self.scaler = torch.cuda.amp.GradScaler(enabled=True)
         else:
             self.scaler = None
 
-        # Exponential moving average (optional)
-        self.ema = None  # can be replaced with an EMA object if desired
-        # Logging (stubbed out; replace with your own logger if needed)
         self.tb = None
 
         # Loss function and metrics based on task type
@@ -135,12 +166,10 @@ class Trainer:
                 "val_loss": [], "val_acc": [], "val_f1_micro": [],
             }
         elif self.task.problem_type == "multilabel":
-            # Multi‑label tasks expect binary targets per class
-
             pos_weight = None
             if args.get("pos_weight", None) is not None:
                 pos_weight = self.compute_pos_weights().to(self.device)
-                print(f"📊 Computed pos_weight for imbalanced classes: {pos_weight.cpu().numpy()}")
+                print(f"Computed pos_weight for imbalanced classes: {pos_weight.cpu().numpy()}")
 
             self.criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
             thr = float(args.get("threshold", 0.5))
@@ -259,6 +288,8 @@ class Trainer:
             loop_kwargs["pred_len"] = flat_args.get("pred_len")
             loop_kwargs["d_out"] = self.task.infer_num_classes(flat_args)
 
+        if "grad_clip" in self.args:
+            loop_kwargs["grad_clip"] = self.args["grad_clip"]
 
         for ep in range(self.args["epochs"] + 1):
             # Training
@@ -270,7 +301,6 @@ class Trainer:
                 self.device,
                 self.amp,
                 self.criterion,
-                self.ema,
                 metrics_fn=self.metrics_fn,
                 **loop_kwargs,
             )
@@ -281,7 +311,6 @@ class Trainer:
                 self.device,
                 self.amp,
                 self.criterion,
-                self.ema,
                 metrics_fn=self.metrics_fn,
                 **loop_kwargs,
             )
@@ -323,12 +352,12 @@ class Trainer:
                     "args": save_args,
                     "history": self.history,
                 }, best_path)
-                print(f"💾 saved best model to {best_path}")
-                print(f"✅ new best {self.early_key} {self.best_metric:.4f}")
+                print(f"saved best model to {best_path}")
+                print(f"new best {self.early_key} {self.best_metric:.4f}")
 
             if should_stop:
                 print(
-                    f"⏹ Early stopping (patience={self.patience}, best={self.best_metric:.4f})."
+                    f"Early stopping (patience={self.patience}, best={self.best_metric:.4f})."
                 )
                 break
 
@@ -351,7 +380,7 @@ class Trainer:
 
         # Save final history to JSON file
         history_path = self.save_history(save_dir)
-        print(f"📊 Training history saved to {history_path}")
+        print(f"Training history saved to {history_path}")
 
         # Return best metric and checkpoint path
         return self.best_metric, best_path
@@ -382,7 +411,6 @@ class Trainer:
 
         pos_weight = neg / (pos + 1e-8)
 
-        # Log class distribution
         print(f"  Total training samples: {n_samples}")
         print(f"  Positive samples per class: {pos.numpy()}")
         print(f"  Negative samples per class: {neg.numpy()}")

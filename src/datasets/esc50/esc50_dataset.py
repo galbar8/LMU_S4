@@ -1,5 +1,4 @@
 from __future__ import annotations
-from dataclasses import dataclass
 from typing import Optional, Literal, Tuple, List
 from pathlib import Path
 import os, zipfile, requests, random
@@ -13,42 +12,11 @@ from torchaudio.transforms import (
     FrequencyMasking, TimeMasking
 )
 
+from src.datasets.esc50.esc50_config import ESC50Config
+
 ESC50_GITHUB_URL = "https://github.com/karoldvl/ESC-50/archive/master.zip"
 ESC50_ZIP_NAME   = "ESC-50-master.zip"
 ESC50_ZIP_DIR    = "ESC-50-master"
-
-@dataclass
-class ESC50Config:
-    root: str
-    split: Literal["train_utils", "val"] = "train_utils"
-    fold_val: int = 1
-    feature: Literal["melspec", "waveform"] = "melspec"
-    sample_rate: int = 16000
-    to_mono: bool = True
-    n_fft: int = 1024
-    hop_length: int = 320
-    n_mels: int = 128
-    f_min: float = 20.0
-    f_max: Optional[float] = None
-    to_db: bool = True
-    # normalization: "none" | "instance" | "global_cmvn"
-    normalize: Literal["none", "instance", "global_cmvn"] = "global_cmvn"
-    target_num_frames: Optional[int] = 250
-    augment: bool = True  # train_utils only
-    # SpecAugment strength
-    freq_mask_param: Optional[int] = None   # if None -> n_mels//5
-    time_mask_param: Optional[int] = None   # if None -> T//10 (runtime)
-    n_freq_masks: int = 2
-    n_time_masks: int = 2
-    # Auto download
-    download: bool = False
-    timeout_s: int = 60
-    # Optional simple waveform augs (train_utils only)
-    wav_time_shift_pct: float = 0.0  # e.g., 0.1 for ±10%
-    wav_gain_db: float = 0.0         # e.g., 3.0 for ±3 dB
-    # Precomputed CMVN (filled for val from train_utils stats)
-    cmvn_mean: Optional[torch.Tensor] = None  # (n_mels,)
-    cmvn_std: Optional[torch.Tensor] = None   # (n_mels,)
 
 class ESC50Dataset(Dataset):
     """
@@ -319,13 +287,6 @@ def worker_init_fn(worker_id: int):
     base_seed = int(os.environ.get("PYTHONHASHSEED", "0")) or 0
     s = base_seed + worker_id
     np.random.seed(s); pyrand.seed(s)
-
-def device_auto() -> torch.device:
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
-        return torch.device("mps")
-    return torch.device("cpu")
 
 def make_esc50_loaders(
     data_root: str,

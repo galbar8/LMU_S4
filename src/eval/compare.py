@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Dict, List, Any
-from src.utils.checkpoint import load_test_results
+from src.utils.checkpoint import load_test_results, load_checkpoint_history
 
 sns.set_style("whitegrid")
 plt.rcParams['figure.figsize'] = (12, 6)
@@ -56,39 +56,33 @@ def load_run_results(run_dir: str) -> Dict[str, Any]:
 
     # Load test metrics from saved test_results.json
     saved_test_results = load_test_results(str(checkpoint_path))
+
     if saved_test_results:
         # For regression tasks (PPG, ETTS)
         results['test_mse'] = saved_test_results.get('mse')
         results['test_mae'] = saved_test_results.get('mae')
         results['test_rmse'] = saved_test_results.get('rmse')
 
-        # For classification tasks (PS-MNIST, ESC-50, PTB-XL)
-        results['test_acc'] = saved_test_results.get('test_accuracy')
-        results['test_loss'] = saved_test_results.get('test_loss')
+        results['accuracy'] = saved_test_results.get('accuracy')
+        results['loss'] = saved_test_results.get('loss')
         results['per_class_accuracy'] = saved_test_results.get('per_class_accuracy')
 
         # For multi-label classification (PTB-XL)
         results['test_f1_micro'] = saved_test_results.get('f1_micro')
         results['threshold'] = saved_test_results.get('threshold')
 
+        # For classification tasks
+        results['f1_score'] = saved_test_results.get('f1_score')
+        results['precision'] = saved_test_results.get('precision')
+        results['recall'] = saved_test_results.get('recall')
+        results['pr_auc'] = saved_test_results.get('pr_auc')
+        results['roc_auc'] = saved_test_results.get('roc_auc')
+
         # Number of samples
         results['num_test_samples'] = saved_test_results.get('num_samples') or saved_test_results.get('num_test_samples')
 
     return results
 
-def load_checkpoint_history(checkpoint_path: str) -> Dict[str, List[float]]:
-    try:
-        checkpoint = torch.load(checkpoint_path, map_location='cpu')
-        history = checkpoint.get('history', {})
-
-        if not history:
-            print(f"No history found in {checkpoint_path}")
-            return {}
-
-        return history
-    except Exception as e:
-        print(f"Error loading {checkpoint_path}: {e}")
-        return {}
 
 def load_all_experiments(
     base_dir: str,
@@ -112,11 +106,18 @@ def load_all_experiments(
                 run_name = f"{run_name}_{sub_task}"
 
             if frac < 1.0:
-                # Fractional dataset
                 frac_pct = int(frac * 100)
                 run_name = f"{run_name}_frac_{frac_pct}"
+                run_dir = base_path / run_name
+            else:
+                run_name_equal_params = f"{run_name}_equal_params"
+                run_dir_equal_params = base_path / run_name_equal_params
 
-            run_dir = base_path / run_name
+                if run_dir_equal_params.exists():
+                    run_dir = run_dir_equal_params
+                    run_name = run_name_equal_params
+                else:
+                    run_dir = base_path / run_name
 
             if run_dir.exists():
                 if print_logs:
@@ -197,10 +198,11 @@ def plot_metric_comparison_bar(
 ):
     """
     Create bar chart comparing a metric across models and fractions.
+    Dynamically adjusts to handle any number of models.
 
     Args:
         all_results: Results from load_all_experiments()
-        metric_key: Key for the metric to compare
+        metric_key: Key for the metric to figs
         title: Plot title
         ylabel: Y-axis label
     """
@@ -208,11 +210,24 @@ def plot_metric_comparison_bar(
     fractions = sorted(set(f for model_results in all_results.values()
                           for f in model_results.keys()))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    n_models = len(models)
+
+    # Dynamic figure sizing
+    fig_width = max(12, len(fractions) * 2 + 4)
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
 
     x = np.arange(len(fractions))
-    width = 0.35
-    colors = {'s4': '#1f77b4', 'lmu': '#ff7f0e'}
+
+    # Dynamically calculate bar width
+    total_width = 0.8
+    width = total_width / n_models if n_models > 0 else 0.8
+
+    # Dynamic color palette
+    if n_models <= 3:
+        color_map = {'s4': '#1f77b4', 'lmu': '#ff7f0e', 'mamba': '#2ca02c'}
+        colors = [color_map.get(model.lower(), plt.cm.tab10(i)) for i, model in enumerate(models)]
+    else:
+        colors = plt.cm.tab10(np.linspace(0, 1, n_models))
 
     for i, model in enumerate(models):
         values = []
@@ -223,26 +238,33 @@ def plot_metric_comparison_bar(
             else:
                 values.append(np.nan)
 
-        offset = width * (i - len(models)/2 + 0.5)
+        offset = width * (i - n_models/2 + 0.5)
         bars = ax.bar(x + offset, values, width,
                      label=model.upper(),
                      alpha=0.8,
-                     color=colors.get(model.lower(), '#2ca02c'))
+                     color=colors[i])
 
-        # Add value labels on bars
+        # Add value labels on bars with dynamic font size
+        font_size = max(7, 9 - n_models // 2)
         for j, (bar, val) in enumerate(zip(bars, values)):
             if not np.isnan(val):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height * 0.5,
                        f'{val:.2f}',
-                       ha='center', va='bottom', fontsize=9)
+                       ha='center', va='bottom', fontsize=font_size)
 
     ax.set_xlabel('Data Fraction', fontsize=12)
     ax.set_ylabel(ylabel, fontsize=12)
     ax.set_title(title, fontsize=14, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels([f'{int(f*100)}%' for f in fractions])
-    ax.legend(fontsize=11)
+
+    # Adjust legend
+    if n_models <= 4:
+        ax.legend(fontsize=11, loc='best')
+    else:
+        ax.legend(fontsize=9, loc='best', ncol=min(3, (n_models + 2) // 3))
+
     ax.grid(True, alpha=0.3, axis='y')
 
     plt.tight_layout()
@@ -298,27 +320,44 @@ def plot_test_metric_comparison(
     metric_key: str = 'test_mae',
     title: str = 'Test MAE Comparison',
     ylabel: str = 'Test MAE (bpm)',
-    lower_is_better: bool = True
+    save_path: str = None,
 ):
     """
     Create bar chart comparing test metrics across models and fractions.
+    Dynamically adjusts to handle any number of models.
 
     Args:
         all_results: Results from load_all_experiments()
-        metric_key: Key for the test metric to compare
+        metric_key: Key for the test metric to figs
         title: Plot title
         ylabel: Y-axis label
-        lower_is_better: If True, lower values are better (for MAE, MSE)
+        save_path: Optional path to save the plot as PNG
     """
     models = list(all_results.keys())
     fractions = sorted(set(f for model_results in all_results.values()
                           for f in model_results.keys()))
 
-    fig, ax = plt.subplots(figsize=(12, 6))
+    n_models = len(models)
+
+    # Dynamic figure sizing based on number of fractions
+    fig_width = max(12, len(fractions) * 2 + 4)
+    fig, ax = plt.subplots(figsize=(fig_width, 6))
 
     x = np.arange(len(fractions))
-    width = 0.35
-    colors = {'s4': '#1f77b4', 'lmu': '#ff7f0e'}
+
+    # Dynamically calculate bar width based on number of models
+    # Ensure bars don't overlap and leave space between groups
+    total_width = 0.8  # Total width for all bars in a group
+    width = total_width / n_models if n_models > 0 else 0.8
+
+    # Use a color palette that scales with number of models
+    if n_models <= 3:
+        # Use predefined colors for common cases
+        color_map = {'s4': '#1f77b4', 'lmu': '#ff7f0e', 'mamba': '#2ca02c'}
+        colors = [color_map.get(model.lower(), plt.cm.tab10(i)) for i, model in enumerate(models)]
+    else:
+        # Use colormap for many models
+        colors = plt.cm.tab10(np.linspace(0, 1, n_models))
 
     for i, model in enumerate(models):
         values = []
@@ -329,53 +368,82 @@ def plot_test_metric_comparison(
             else:
                 values.append(np.nan)
 
-        offset = width * (i - len(models)/2 + 0.5)
+        # Center the bars around each x position
+        offset = width * (i - n_models/2 + 0.5)
         bars = ax.bar(x + offset, values, width,
                      label=model.upper(),
                      alpha=0.8,
-                     color=colors.get(model.lower(), '#2ca02c'))
+                     color=colors[i])
 
         # Add value labels on bars
+        # Adjust font size based on number of models
+        font_size = max(7, 9 - n_models // 2)
         for j, (bar, val) in enumerate(zip(bars, values)):
             if not np.isnan(val):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height,
-                       f'{val:.2f}',
-                       ha='center', va='bottom', fontsize=9, fontweight='bold')
+                       f'{val:.3f}',
+                       ha='center', va='bottom', fontsize=font_size, fontweight='bold')
 
     ax.set_xlabel('Data Fraction', fontsize=12)
     ax.set_ylabel(ylabel, fontsize=12)
     ax.set_title(title, fontsize=14, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels([f'{int(f*100)}%' for f in fractions])
-    ax.legend(fontsize=11)
+
+    # Adjust legend based on number of models
+    if n_models <= 4:
+        ax.legend(fontsize=11, loc='best')
+    else:
+        # Use smaller font and multiple columns for many models
+        ax.legend(fontsize=9, loc='best', ncol=min(3, (n_models + 2) // 3))
+
     ax.grid(True, alpha=0.3, axis='y')
 
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+
     plt.show()
 
 
 def plot_test_data_efficiency(
     all_results: Dict[str, Dict[float, Dict[str, Any]]],
     metric_key: str = 'test_mae',
-    ylabel: str = 'Test MAE (bpm)'
+    ylabel: str = 'Test MAE (bpm)',
+    save_path: str = None,
 ):
     """
     Plot test metric vs data fraction to show data efficiency on test set.
+    Dynamically adjusts to handle any number of models.
 
     Args:
         all_results: Results from load_all_experiments()
         metric_key: Test metric to plot
         ylabel: Y-axis label
+        save_path: Optional path to save the plot as PNG
     """
     models = list(all_results.keys())
+    n_models = len(models)
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    colors = {'s4': '#1f77b4', 'lmu': '#ff7f0e'}
-    markers = {'s4': 'o', 'lmu': 's'}
+    # Extended color and marker palettes
+    color_map = {'s4': '#1f77b4', 'lmu': '#ff7f0e', 'mamba': '#2ca02c'}
+    marker_map = {'s4': 'o', 'lmu': 's', 'mamba': '^'}
 
-    for model in models:
+    # Generate colors and markers for all models
+    if n_models <= 3:
+        colors = [color_map.get(m.lower(), plt.cm.tab10(i)) for i, m in enumerate(models)]
+        markers = [marker_map.get(m.lower(), ['o', 's', '^', 'D', 'v', '*'][i % 6]) for i, m in enumerate(models)]
+    else:
+        colors = plt.cm.tab10(np.linspace(0, 1, n_models))
+        markers = ['o', 's', '^', 'D', 'v', '*', 'p', 'h', '<', '>']
+        markers = [markers[i % len(markers)] for i in range(n_models)]
+
+    for i, model in enumerate(models):
         fractions = []
         values = []
 
@@ -389,21 +457,32 @@ def plot_test_data_efficiency(
         if fractions:
             ax.plot(fractions, values,
                    label=model.upper(),
-                   marker=markers.get(model.lower(), 'o'),
+                   marker=markers[i],
                    markersize=10,
                    linewidth=2.5,
-                   color=colors.get(model.lower(), '#2ca02c'),
+                   color=colors[i],
                    alpha=0.8)
 
     ax.set_xlabel('Training Data (%)', fontsize=12)
     ax.set_ylabel(ylabel, fontsize=12)
     ax.set_title('Test Set Performance: Data Efficiency Comparison',
                  fontsize=14, fontweight='bold')
-    ax.legend(fontsize=11, loc='best')
+
+    # Adjust legend based on number of models
+    if n_models <= 4:
+        ax.legend(fontsize=11, loc='best')
+    else:
+        ax.legend(fontsize=9, loc='best', ncol=min(2, (n_models + 1) // 2))
+
     ax.grid(True, alpha=0.3)
     ax.set_xticks([10, 25, 50, 100])
 
     plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+
     plt.show()
 
 
@@ -522,3 +601,84 @@ def plot_single_metric_comparison(
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_performance_heatmap(
+    all_results: Dict[str, Dict[float, Dict[str, Any]]],
+    metric_key: str = 'accuracy',
+    title: str = 'Performance Heatmap',
+    cmap: str = 'RdYlGn',
+    annot_format: str = '.4f',
+    vmin: float = None,
+    vmax: float = None,
+    save_path: str = None,
+):
+    """
+    Create a heatmap showing metric values across models and data fractions.
+
+    Args:
+        all_results: Results from load_all_experiments()
+        metric_key: Metric to visualize (e.g., 'test_f1_micro', 'test_mae', 'accuracy')
+        title: Plot title
+        cmap: Colormap name (default: 'RdYlGn' for green=good)
+        annot_format: Format string for annotations (e.g., '.4f', '.2f', '.2%')
+        vmin: Minimum value for color scale
+        vmax: Maximum value for color scale
+        save_path: Optional path to save the plot as PNG
+    """
+    models = sorted(all_results.keys())
+    fractions = sorted(set(f for model_results in all_results.values()
+                          for f in model_results.keys()))
+
+    # Create matrix for heatmap
+    data = []
+    for model in models:
+        row = []
+        for frac in fractions:
+            if frac in all_results[model] and all_results[model][frac]:
+                val = all_results[model][frac].get(metric_key, np.nan)
+                row.append(val if val is not None else np.nan)
+            else:
+                row.append(np.nan)
+        data.append(row)
+
+    # Convert to DataFrame
+    df = pd.DataFrame(
+        data,
+        index=[m.upper() for m in models],
+        columns=[f'{int(f*100)}%' for f in fractions]
+    )
+
+    # Create heatmap
+    fig, ax = plt.subplots(figsize=(10, 4))
+
+    # Reverse colormap if lower is better (e.g., for loss, mae, mse)
+    reverse_metrics = ['loss', 'mae', 'mse', 'rmse', 'test_loss', 'test_mae', 'test_mse', 'test_rmse']
+    if any(metric in metric_key.lower() for metric in reverse_metrics):
+        cmap = cmap + '_r'
+
+    sns.heatmap(
+        df,
+        annot=True,
+        fmt=annot_format,
+        cmap=cmap,
+        cbar_kws={'label': metric_key.replace('_', ' ').title()},
+        linewidths=0.5,
+        linecolor='gray',
+        vmin=vmin,
+        vmax=vmax,
+        ax=ax
+    )
+
+    ax.set_xlabel('Data Fraction', fontsize=12)
+    ax.set_ylabel('Model', fontsize=12)
+    ax.set_title(title, fontsize=14, fontweight='bold', pad=20)
+
+    plt.tight_layout()
+
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        print(f"Plot saved to: {save_path}")
+
+    plt.show()
+
