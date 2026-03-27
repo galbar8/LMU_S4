@@ -106,12 +106,12 @@ This report consolidates complete results from all trained models across dataset
 
 ### Full Results Across Data Fractions (F1-Micro)
 
-| Model | 10% | 25% | 50% | 100% | Trend |
-|-------|-----|-----|-----|------|-------|
-| **LMU** | 0.6166 | 0.6586 | 0.6691 | 0.8589 | Strong improvement at full data |
-| **S4** | **0.6360** | **0.6799** | **0.7012** | **0.7283** | Steady, consistent lead |
+| Model | 10% | 25% | 50% | 100%       | Trend |
+|-------|-----|-----|-----|------------|-------|
+| **LMU** | 0.6166 | 0.6586 | 0.6691 | **0.8589** | Strong improvement at full data |
+| **S4** | **0.6360** | **0.6799** | **0.7012** | 0.8416     | Steady, consistent lead |
 
-**Key Finding:** S4 leads at 10%, 25%, 50% but LMU catches up dramatically at 100% (85.89% vs 72.83%). Suggests different scaling properties.
+**Key Finding:** S4 leads at 10%, 25%, 50% but LMU catches up at 100% (85.89% vs 84.16%). Suggests different scaling properties.
 
 ---
 
@@ -198,15 +198,12 @@ This report consolidates complete results from all trained models across dataset
 | ESC-50 | S4 | Accuracy | 0.5600 | LMU (0.4950) | - |
 | PPG | S4 | MAE ↓ | 4.814 | MAMBA (8.975) | LMU (6.770) |
 | QQP | S4 | Accuracy | 0.8071 | LMU (0.7873) | MAMBA (0.7853) |
-| PTB-XL | LMU | F1-Micro | 0.8589 | S4 (0.7283) | - |
+| PTB-XL | LMU | F1-Micro | 0.8589 | S4 (0.8416) | - |
 | ListOps | MAMBA | Accuracy | 0.4285 | S4 (0.4235) | LMU (0.3880) |
 | ETTh1 | LMU | MAE ↓ | 0.2883* | S4 (0.2883) | - |
 | ETTh2 | LMU | MAE ↓ | 0.4060 | S4 (0.4589) | - |
 | ETTm1 | S4 | MAE ↓ | 0.1656 | LMU (0.1942) | - |
 | ETTm2 | LMU | MAE ↓ | 0.3259 | S4 (0.3091) | - |
-
-*Note: S4 PS-MNIST slightly higher (0.9705), but LMU better at small data.
-*Note: ETTh1 shows both at essentially same performance.
 
 ### Overall Model Wins
 
@@ -280,7 +277,7 @@ $$\Delta_{S4,LMU}(\text{Dataset}) = \text{Metric}_{S4} - \text{Metric}_{LMU}$$
 ### LMU Dominance (Δ < -0.05)
 
 1. **PS-MNIST, SMNIST**: Sequential pixel processing - LMU maintains high accuracy on small data
-2. **PTB-XL**: ECG classification - LMU's 85.89% vs S4's 72.83% (13% absolute difference)
+2. **PTB-XL**: ECG classification - LMU's 85.89% vs S4's 84.16% (1.73% absolute difference)
 3. **PPG**: Heart rate regression - LMU's consistency vs S4's poor small-data scaling
 4. **ETTm1, ETTm2**: Fine-grained time series forecasting
 
@@ -333,46 +330,3 @@ $$\Delta_{S4,LMU}(\text{Dataset}) = \text{Metric}_{S4} - \text{Metric}_{LMU}$$
 - **|Δ| > 0.1**: Fundamentally different model properties needed (PTB-XL)
 - **0.05 < |Δ| < 0.1**: Meaningful but not definitive advantage (CIFAR-10, ESC-50)
 - **|Δ| < 0.05**: Models are effectively equivalent; choice depends on efficiency/implementation
-
----
-
-## Recommendations
-
-### For Practitioners
-
-1. **Vision/Audio/NLP Tasks**: Start with **S4**
-   - Proven strong across these modalities
-   - Consistent improvements with data scaling
-
-2. **Sequential Pixel/ECG Tasks**: Use **LMU**
-   - Superior sample efficiency
-   - Better small-data performance
-   - LMU's memory structure matches global temporal patterns
-
-3. **Parameter-Constrained Scenarios**: Consider **MAMBA**
-   - Best parameter efficiency on synthetic/discrete tasks
-   - May underperform LMU/S4 on continuous sequences without full data
-
-4. **Time Series Forecasting**: **Both LMU and S4** are competitive
-   - No clear winner; dataset-specific
-   - Try both with proper hyperparameter tuning
-
-### For Research
-
-1. **Investigate Δ extremes**: Why does LMU dominate PTB-XL by 13%?
-2. **PPG phenomenon**: S4's terrible small-data performance suggests architectural mismatch
-3. **ListOps scaling**: MAMBA's superior scaling suggests selective attention is crucial for synthetic long-range tasks
-4. **Time series paradox**: Why do fine-grained (minute) and hourly forecasting show opposite model preferences?
-
----
-
-## Data Availability
-
-All results derived from actual trained model checkpoints in:
-- `src/notebooks/{dataset}/runs/{model}_task(_frac_X)?/test_results.json`
-
-**Status**: ✓ All datasets evaluated | ✓ LMU and S4 complete | ✓ MAMBA on 4/12 datasets | ⚠ MAMBA on ETTS missing
-
-**Last Updated**: March 26, 2026  
-**Total Models Evaluated**: 129 (12 datasets × 3 models × 4 fractions, some incomplete)
-

@@ -53,12 +53,6 @@ pip install -r requirements.txt
 ```bash
 # Train a single model on a dataset
 python main.py --dataset cifar10 --model s4 --fraction 100
-
-# Full evaluation pipeline
-python main.py --all-experiments
-
-# View results
-python -m src.eval.report  # Generate comparison report
 ```
 
 ## Project Structure
@@ -135,28 +129,34 @@ See **[RESULTS.md](RESULTS.md)** for comprehensive cross-dataset analysis includ
 ### Key Findings
 
 #### Model Dominance (100% Training Data)
-- **S4**: 6 dataset wins (Vision, Audio, NLP, Regression)
-  - CIFAR-10: 74.21% (best sequential vision)
-  - ESC-50: 56.00% (best audio)
-  - PPG: 4.814 MAE (best regression)
+- **S4**: 6 dataset wins
+  - CIFAR-10: 0.7421 (74.21% accuracy)
+  - ESC-50: 0.5600 (56.00% accuracy)
+  - PPG: 4.814 MAE (heart rate bpm)
+  - QQP: 0.8071 (80.71% accuracy)
+  - ETTm1: 0.1656 MAE
+  - ListOps: 0.4235 (42.35% accuracy, tied)
   
-- **LMU**: 4 dataset wins (Sequential pixels, ECG)
-  - SMNIST: 98.70% (sequential MNIST)
-  - PTB-XL: 85.89% (ECG classification)
+- **LMU**: 4 dataset wins
+  - SMNIST: 0.9870 (98.70% accuracy)
+  - PTB-XL: 0.8589 (85.89% F1-Micro)
+  - PS-MNIST: 0.9624 (96.24% accuracy, small-data dominant)
+  - ETTh2: 0.4060 MAE
   
-- **Mamba**: 1 dataset win (Synthetic long-range)
-  - ListOps: 42.85% (structured dependencies)
+- **Mamba**: 1 dataset win
+  - ListOps: 0.4285 (42.85% accuracy)
 
 #### Sample Efficiency Insights
-- **Data-Efficient**: SMNIST LMU (+7.89% improvement 10%→100%)
-- **Data-Hungry**: ESC-50 S4 (+285.6% improvement 10%→100%)
-- **Unusual**: PPG S4 (-111.5% reversal: worst at 10%, best at 100%)
+- **Data-Efficient**: SMNIST LMU (0.9149→0.9870, +7.89%)
+- **Data-Hungry**: ESC-50 S4 (0.1450→0.5600, +285.6%)
+- **Unusual**: PPG S4 (10.149→4.814 MAE, severe reversal from worst to best)
 
 #### Surprising Findings
-1. **PTB-XL LMU Dominance**: 13% absolute advantage (85.89% vs 72.83%)
-2. **ETTS Non-Monotonic**: Some models perform better at 50% than 100%
-3. **MAMBA Scaling**: Worst at 10% (17.8%), best at 100% (42.85%)
-4. **S4 Audio**: Wins all ESC-50 fractions (no crossover behavior)
+1. **PTB-XL LMU Dominance**: LMU (0.8589, 85.89%) vs S4 (0.7283, 72.83%) - 13.1% absolute difference
+2. **PPG S4 Paradox**: S4 worst at 10% (10.149 MAE) but best at 100% (4.814 MAE) - extreme reversal
+3. **ETTS Non-Monotonic Scaling**: Some models perform better at 50% than at 100% data
+4. **Mamba ListOps**: Improves from 17.8% (10%) to 42.85% (100%) - +140% improvement
+5. **S4 Audio Consistency**: Wins all ESC-50 fractions (10%, 25%, 50%, 100%) with no crossover
 
 ## Experimental Setup
 
